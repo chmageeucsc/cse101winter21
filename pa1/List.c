@@ -4,6 +4,7 @@
 //
 // Chantel Gee
 // chmagee
+// pa1
 // 
 //-----------------------------------------------------------------------------
 
@@ -228,10 +229,14 @@ void prepend(List L, int x) {
 		L->length++;
 	}
 	else {
+		temp->prev = NULL;
+		temp->next = L->front;
 		L->front->prev = temp;
-		L->front->next = L->front;
 		L->front = temp;
 		L->length++;
+	}
+	if (index(L) != -1) {
+		L->index++;
 	}
 }
 
@@ -244,8 +249,9 @@ void append(List L, int x) {
 		L->length++;
 	}
 	else {
+		temp->next = NULL;
+		temp->prev = L->back;
 		L->back->next = temp;
-		L->back->prev = L->back;
 		L->back = temp;
 		L->length++;
 	}
@@ -265,11 +271,18 @@ void insertBefore(List L, int x) {
 		printf("List Error: calling insertBefore() on an undefined index\n");
 		exit(EXIT_FAILURE);
 	}
-	
-	Node temp = newNode(x);
-	L->cursor->prev = temp;
-	temp->next = L->cursor;
-	L->length++;
+	if(index(L) == 0) {
+		prepend(L,x);
+	}
+	else {
+		Node temp = newNode(x);
+		temp->prev = L->cursor->prev;
+		L->cursor->prev->next = temp;
+		L->cursor->prev = temp;
+		temp->next = L->cursor;
+		L->length++;
+		L->index++;
+	}
 }
 
 // pre: length() > 0 and index() >= 0
@@ -287,10 +300,17 @@ void insertAfter(List L, int x) {
 		exit(EXIT_FAILURE);
 	}
 	
-	Node temp = newNode(x);
-	L->cursor->next = temp;
-	temp->prev = L->cursor;
-	L->length++;
+	if(index(L) == L->length - 1) {
+		append(L,x);
+	}
+	else {		
+		Node temp = newNode(x);
+		temp->next = L->cursor->next;
+		L->cursor->next->prev = temp;
+		L->cursor->next = temp;
+		temp->prev = L->cursor;
+		L->length++;
+	}
 }
 
 // pre: length() > 0
@@ -307,21 +327,18 @@ void deleteFront(List L) {
 	Node temp = L->front;
 	if(length(L) > 1) {
 		if(L->front != NULL) {
-			printf("front not null\n");
 			if(L->front->next != NULL) {
-				printf("front next not null\n");
 				L->front = L->front->next;
-				printf("front is front next\n");
 			}
 			if(L->front != NULL) {
-				printf("front not null\n");
 				L->front->prev = NULL;
-				printf("front prev null\n");
 			}
+			L->index--;
 		}
 	}
 	else {
 		L->front = L->back = L->cursor = NULL;
+		L->index = -1;
 	}
 	freeNode(&temp);
 	L->length--;
@@ -341,21 +358,17 @@ void deleteBack(List L) {
 	Node temp = L->back;
 	if(length(L) > 1) {
 		if (L->back != NULL) {
-			printf("back not null\n");
 			if (L->back->prev != NULL) {
-				printf("back prev not null\n");
 				L->back = L->back->prev;
-				printf("back is back prev\n");
 			}
 			if (L->back != NULL) {
-				printf("back not null\n");
 				L->back->next = NULL;
-				printf("back next null\n");
 			}
 		}
 	}
 	else {
 		L->front = L->back = L->cursor = NULL;
+		L->index = -1;
 	}
 	freeNode(&temp);
 	L->length--;
@@ -388,9 +401,8 @@ void printList(FILE* out, List L) {
 		printf("List Error: calling printList() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	out = fopen("file.txt", "w+");
 	Node temp = L->front;
-	if(temp != NULL) {
+	while(temp != NULL) {
 		fprintf(out, "%d", temp->data);		// fix to print strings later
 		temp = temp->next;
 		if(temp != NULL) {
@@ -399,17 +411,34 @@ void printList(FILE* out, List L) {
 	}
 }
 
-List copyList(List L) {
-	List copy = L;
+List copyList(List L) {	
+	List copy = newList();
+	Node cursorHold = L->cursor;	// keeps track of L's cursor
+	int indexHold = L->index;		// keeps track of L's index
+	//Node temp = L->front;
+	moveFront(L);
+	while(L->cursor != NULL) {
+		append(copy, L->cursor->data);
+		moveNext(L);
+	}
+	L->cursor = cursorHold;
+	L->index = indexHold;
 	copy->cursor = NULL;
 	copy->index = 0;
 	return copy;
 }
 
-List concatList(List A, List B){
-	List C = A;
-	List D = B;
-	C->back->next = D->front;
+List concatList(List A, List B) {	// FIX IT GENIUS
+	List C = copyList(A);
+	Node cursorHold = B->cursor;	// keeps track of L's cursor
+	int indexHold = B->index;		// keeps track of L's index
+	moveFront(B);
+	while(B->cursor != NULL) {
+		append(C, B->cursor->data);
+		moveNext(B);
+	}
+	B->cursor = cursorHold;
+	B->index = indexHold;
 	C->cursor = NULL;
 	C->index = 0;
 	return C;

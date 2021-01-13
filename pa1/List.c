@@ -327,6 +327,11 @@ void deleteFront(List L) {
 	Node temp = L->front;
 	if(length(L) > 1) {
 		if(L->front != NULL) {
+			/*if(L->cursor != NULL) {
+				if(L->cursor == L->front) {
+					moveNext(L);
+				}
+			}*/
 			if(L->front->next != NULL) {
 				L->front = L->front->next;
 			}
@@ -358,6 +363,11 @@ void deleteBack(List L) {
 	Node temp = L->back;
 	if(length(L) > 1) {
 		if (L->back != NULL) {
+			if(L->cursor != NULL) {
+				if(L->cursor == L->back) {
+					L->index = -1;
+				}
+			}
 			if (L->back->prev != NULL) {
 				L->back = L->back->prev;
 			}
@@ -388,11 +398,19 @@ void delete(List L) {
 		printf("List Error: calling delete() on an undefined index\n");
 		exit(EXIT_FAILURE);
 	}
-	
-	Node temp = L->cursor;
-	L->cursor->prev->next = L->cursor->next;
-	free(temp);
-	L->length--;
+	if(L->cursor == L->front) {
+		deleteFront(L);
+	}
+	else if(L->cursor == L->back) {
+		deleteBack(L);
+	}
+	else {
+		Node temp = L->cursor;
+		L->cursor->prev->next = L->cursor->next;
+		free(temp);
+		L->length--;
+	}
+	L->cursor = NULL;
 }
 
 // Other operations -----------------------------------------------------------

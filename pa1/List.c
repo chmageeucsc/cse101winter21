@@ -327,11 +327,6 @@ void deleteFront(List L) {
 	Node temp = L->front;
 	if(length(L) > 1) {
 		if(L->front != NULL) {
-			/*if(L->cursor != NULL) {
-				if(L->cursor == L->front) {
-					moveNext(L);
-				}
-			}*/
 			if(L->front->next != NULL) {
 				L->front = L->front->next;
 			}
@@ -433,7 +428,6 @@ List copyList(List L) {
 	List copy = newList();
 	Node cursorHold = L->cursor;	// keeps track of L's cursor
 	int indexHold = L->index;		// keeps track of L's index
-	//Node temp = L->front;
 	moveFront(L);
 	while(L->cursor != NULL) {
 		append(copy, L->cursor->data);
@@ -446,7 +440,7 @@ List copyList(List L) {
 	return copy;
 }
 
-List concatList(List A, List B) {	// FIX IT GENIUS
+List concatList(List A, List B) {
 	List C = copyList(A);
 	Node cursorHold = B->cursor;	// keeps track of L's cursor
 	int indexHold = B->index;		// keeps track of L's index

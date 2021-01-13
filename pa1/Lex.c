@@ -19,12 +19,9 @@
 
 int main(int argc, char * argv[]){
 
-	//int token_count;
 	int line_count;
 	FILE *in, *out;
 	char line[MAX_LEN];
-	//char tokenBuffer[MAX_LEN];
-	//char* token;
 
 	// check command line for correct number of arguments
 	if( argc != 3 ){
@@ -49,36 +46,13 @@ int main(int argc, char * argv[]){
 	line_count = 0;
 	while( fgets(line, MAX_LEN, in) != NULL)  {
 		line_count++;
-
-		// get tokens in this line
-		/*token_count = 0;
-		tokenBuffer[0] = '\0';
-
-		// get first token
-		token = strtok(line, " \n");
-
-		while( token!=NULL ){ // we have a token
-			// update token buffer
-			strcat(tokenBuffer, "   ");
-			strcat(tokenBuffer, token);
-			strcat(tokenBuffer, "\n");
-			token_count++;
-
-			// get next token
-			token = strtok(NULL, " \n");
-		}
-
-		// print tokens in this line
-		fprintf(out, "line %d contains %d ", line_count, token_count);
-		fprintf(out, "token%s: \n", token_count==1?"":"s" );
-		fprintf(out, "%s\n", tokenBuffer);*/
 	}
 	
 	//fprintf(out, "the total number of lines is %d\n", line_count);
 	char array [line_count][MAX_LEN];
 	int x = 0;
-	rewind(in);
-	while( fgets(line, MAX_LEN, in) != NULL)  {
+	rewind(in);		// resets fgets to the top of the file
+	while( fgets(line, MAX_LEN, in) != NULL)  {	// populates array with lines from input file
 		strcpy(array[x], line);
 		x++;
 	}

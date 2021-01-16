@@ -2,7 +2,7 @@
 # Makefile for CSE 101 Programming Assignment 1 (given)
 #
 # Chantel Gee
-# chmagee (1684456)
+# chmagee
 #
 # make                   makes Lex
 # make ListClient        makes ListClient

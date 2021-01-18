@@ -3,8 +3,8 @@
 // Chantel Gee, chmagee
 // 2021 Winter CSE 101 pa2
 // 
-// List.h
-// Header file for List
+// Graph.h
+// Header file for Graph
 // 
 //-----------------------------------------------------------------------------
 
@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "List.h"
 
 #define INF -1
@@ -21,6 +22,11 @@
 #define WHITE 1
 #define GRAY 2
 #define BLACK 3
+
+// extras ---------------------------------------------------------------------
+
+extern int bfs_source;
+extern bool bfs_on;
 
 typedef struct GraphObj* Graph;
 

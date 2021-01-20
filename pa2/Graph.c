@@ -150,38 +150,100 @@ int getDist(Graph G, int u) {
 	return INF;
 }
 
+// pre: getSource(G) != NIL
 // pre: 1 <= u <= getOrder(G)
 void getPath(List L, Graph G, int u) {
 	if(G == NULL){
 		printf("Graph Error: calling getPath() on NULL Graph reference\n");
 		exit(EXIT_FAILURE);
 	}
+	if(getSource(G) == NIL) {
+		printf("Graph Error: calling getPath() with no source\n");
+		exit(EXIT_FAILURE);
+	}
 	if(u < 1 || u > getOrder(G)) {
 		printf("Graph Error: calling getPath() out of bounds\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("filler text");
+	while(G->p[u] != getSource(G)) {
+		if(G->p[u] == NIL) {
+			append(L, -1);
+			break;
+		}
+		else{
+			append(L, G->p[u]);
+			getPath(L, G, G->p[u]);
+		}
+	}
 }
 
 /*** Manipulation procedures ***/
 
 void makeNull(Graph G) {
-	printf("filler text");
+	if(G == NULL){
+		printf("Graph Error: calling makeNULL() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	for (int i = 1; i <= getOrder(G); i++){
+		clear(G->adj[i]);
+	}
 }
 
-void addEdge(Graph G, int u, int v) {
-	// u>0&&u<=getOrder(G)&&v>0&&v<=getOrder(G)
-	printf("filler text");
+void addEdge(Graph G, int u, int v) {	// both ways
+	if(G == NULL){
+		printf("Graph Error: calling addEdge() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if((u < 1 && u > getOrder(G)) || (v < 1 && v > getOrder(G))) {
+		printf("Graph Error: calling addEdge() out of bounds\n");
+		exit(EXIT_FAILURE);
+	}
+	addArc(G, u, v);
+	addArc(G, v, u);
+	G->size--;
 }
 
-void addArc(Graph G, int u, int v) {
-	// u>0&&u<=getOrder(G)&&v>0&&v<=getOrder(G)
-	printf("filler text");
+void addArc(Graph G, int u, int v) {	// one way
+	if(G == NULL){
+		printf("Graph Error: calling addArc() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	if((u < 1 && u > getOrder(G)) || (v < 1 && v > getOrder(G))) {
+		printf("Graph Error: calling addArc() out of bounds\n");
+		exit(EXIT_FAILURE);
+	}
+	G->size++;
+	if(length(G->adj[u]) == 0) {
+		append(G->adj[u], v);
+	}
+	else {
+		int j = 1;
+		for (int i = 0; i < length(G->adj[u]); i++) {
+			moveFront(G->adj[u]);
+			while (j <= i) {
+				if (v < get(G->adj[u])) {
+					insertBefore(G->adj[u], v);
+					break;
+				}
+				else if (v > get(G->adj[u])) {
+					moveNext(G->adj[u]);
+					if (index(G->adj[u]) == -1) {
+						append(G->adj[u], v);
+						break;
+					}
+				}
+				else if (v == get(G->adj[u])) {
+					insertAfter(G->adj[u], v);
+					break;
+				}
+			}
+		}
+	}
 }
 
 void BFS(Graph G, int s) {
 	bfs_source = s;
-	for(int i = 1; i < G->size; i++) {
+	for(int i = 1; i <= getOrder(G); i++) {
 		if (i != s){
 			G->color[i] = WHITE;
 			G->d[i] = INF;
@@ -196,7 +258,7 @@ void BFS(Graph G, int s) {
 	while(L != NULL) {
 		int x = front(L);
 		deleteFront(L);
-		for(int y = 1; y < getOrder(G) + 1; y++) {
+		for(int y = 1; y <= getOrder(G); y++) {
 			if(G->color[y] == WHITE) {
 				G->color[y] = GRAY;
 				G->d[y] = G->d[x] + 1;
@@ -213,5 +275,14 @@ void BFS(Graph G, int s) {
 /*** Other operations ***/
 
 void printGraph(FILE* out, Graph G) {
-	printf("filler text");
+	if(G == NULL){
+		printf("Graph Error: calling printGraph() on NULL Graph reference\n");
+		exit(EXIT_FAILURE);
+	}
+	for(int i = 1; i <= getOrder(G); i++){
+		fprintf(out, "%d: ", i);
+		for(int j = 1; j <= length(G->adj[i]); j++) {
+			printList(out, G->adj[j]);
+		}
+	}
 }

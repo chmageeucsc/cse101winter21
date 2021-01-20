@@ -50,6 +50,7 @@ int getParent(Graph G, int u);
 // pre: 1 <= u <= getOrder(G)
 int getDist(Graph G, int u);
 
+// pre: getSource(G) != NIL
 // pre: 1 <= u <= getOrder(G)
 void getPath(List L, Graph G, int u);
 
@@ -57,8 +58,10 @@ void getPath(List L, Graph G, int u);
 
 void makeNull(Graph G);
 
+// pre: 1 < u < getOrder(G) and 1 < v < getOrder(G)
 void addEdge(Graph G, int u, int v);
 
+// pre: 1 < u < getOrder(G) and 1 < v < getOrder(G)
 void addArc(Graph G, int u, int v);
 
 void BFS(Graph G, int s);

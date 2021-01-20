@@ -4,7 +4,7 @@
 // 2021 Winter CSE 101 pa2
 // 
 // Graph.c
-// Implementation file for List
+// Implementation file for Graph
 // 
 //-----------------------------------------------------------------------------
 
@@ -189,6 +189,7 @@ void makeNull(Graph G) {
 	}
 }
 
+// pre: 1 < u < getOrder(G) and 1 < v < getOrder(G)
 void addEdge(Graph G, int u, int v) {	// both ways
 	if(G == NULL){
 		printf("Graph Error: calling addEdge() on NULL Graph reference\n");
@@ -203,6 +204,7 @@ void addEdge(Graph G, int u, int v) {	// both ways
 	G->size--;
 }
 
+// pre: 1 < u < getOrder(G) and 1 < v < getOrder(G)
 void addArc(Graph G, int u, int v) {	// one way
 	if(G == NULL){
 		printf("Graph Error: calling addArc() on NULL Graph reference\n");
@@ -220,7 +222,7 @@ void addArc(Graph G, int u, int v) {	// one way
 		int j = 1;
 		for (int i = 0; i < length(G->adj[u]); i++) {
 			moveFront(G->adj[u]);
-			while (j <= i) {
+			while (j > i) {
 				if (v < get(G->adj[u])) {
 					insertBefore(G->adj[u], v);
 					break;
@@ -232,10 +234,10 @@ void addArc(Graph G, int u, int v) {	// one way
 						break;
 					}
 				}
-				else if (v == get(G->adj[u])) {
+				/*else if (v == get(G->adj[u])) {
 					insertAfter(G->adj[u], v);
 					break;
-				}
+				}*/
 			}
 		}
 	}
@@ -255,15 +257,15 @@ void BFS(Graph G, int s) {
 	G->p[s] = NIL;
 	List L = newList();
 	append(L,s);
-	while(L != NULL) {
+	while(L->front != NULL) {
 		int x = front(L);
 		deleteFront(L);
-		for(int y = 1; y <= getOrder(G); y++) {
-			if(G->color[y] == WHITE) {
-				G->color[y] = GRAY;
-				G->d[y] = G->d[x] + 1;
-				G->p[y] = x;
-				append(L,y);
+		for(moveFront(G->adj[x]); index(G->adj[x]) >= 0; moveNext(G->adj[x])) {
+			if(G->color[get(G->adj[x])] == WHITE) {
+				G->color[get(G->adj[x])] = GRAY;
+				G->d[get(G->adj[x])] = G->d[x] + 1;
+				G->p[get(G->adj[x])] = x;
+				append(L,get(G->adj[x]));
 			}
 		}
 		G->color[x] = BLACK;
@@ -281,8 +283,7 @@ void printGraph(FILE* out, Graph G) {
 	}
 	for(int i = 1; i <= getOrder(G); i++){
 		fprintf(out, "%d: ", i);
-		for(int j = 1; j <= length(G->adj[i]); j++) {
-			printList(out, G->adj[j]);
-		}
+		printList(out, G->adj[i]);
+		fprintf(out, "\n");
 	}
 }

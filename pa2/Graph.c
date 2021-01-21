@@ -187,6 +187,7 @@ void makeNull(Graph G) {
 	for (int i = 1; i <= getOrder(G); i++){
 		clear(G->adj[i]);
 	}
+	G->size = 0;
 }
 
 // pre: 1 < u < getOrder(G) and 1 < v < getOrder(G)
@@ -234,10 +235,9 @@ void addArc(Graph G, int u, int v) {	// one way
 						break;
 					}
 				}
-				/*else if (v == get(G->adj[u])) {
-					insertAfter(G->adj[u], v);
+				else if (v == get(G->adj[u])) {
 					break;
-				}*/
+				}
 			}
 		}
 	}

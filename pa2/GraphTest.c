@@ -13,13 +13,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "List.h"
 #include "Graph.h"
 
 int main(void) {
 	Graph A = newGraph(100);
-	List C = newList();
-	List L = newList();
 	
 	/*addArc(A, 64, 4);
 	addArc(A, 64, 3);
@@ -50,26 +49,24 @@ int main(void) {
 	getPath(L, A, 2);
 	if (!equals(C, L)) {printf("equal 4 \n");}*/
 	
-	for (int i = 1; i <= 100; i++){
-		if (getDist(A, i) != INF) {printf("inf >:( \n");}
-		addArc(A, 64, 4);
-		addArc(A, 64, 3);
-		addArc(A, 42, 2);
-		addArc(A, 2, 64);
-		addArc(A, 4, 2);
-		addArc(A, 3, 42);
-		BFS(A, 64);
-		if (getDist(A, 64) != 0) {printf("0 >:( \n");}
-		if (getDist(A, 2) != 2) {printf("2 >:( \n");}
-		BFS(A, 4);
-		if (getDist(A, 42) != 4) {printf("4 >:( \n");}
-		if (getDist(A, 43) != INF) {printf("inf >:( \n");}
-		BFS(A, 99);
-		if (getDist(A, 64) != INF) {printf("inf >:( \n");}
+	/*for (int i = 1; i <= 100; i++) {
+		if (getDist(A, i) != INF) {printf("0 inf >:( %d\n", getDist(A, i));}
 	}
+	addEdge(A, 64, 4);
+	addEdge(A, 64, 3);
+	addEdge(A, 42, 2);
+	addEdge(A, 2, 64);
+	addEdge(A, 4, 2);
+	addEdge(A, 3, 42);
+	BFS(A, 64);
+	if (getDist(A, 64) != 0) {printf("0 >:( %d\n", getDist(A, 64));}
+	if (getDist(A, 2) != 1) {printf("2 >:( %d\n", getDist(A, 2));}
+	BFS(A, 4);
+	if (getDist(A, 42) != 2) {printf("4 >:( %d\n", getDist(A, 42));}
+	if (getDist(A, 43) != INF) {printf("1 inf >:( %d\n", getDist(A, 43));}
+	BFS(A, 99);
+	if (getDist(A, 64) != INF) {printf("2 inf >:( %d\n", getDist(A, 64));}*/
 
-	freeList(&L);
-	freeList(&C);
 	freeGraph(&A);
 	return 0;
 }

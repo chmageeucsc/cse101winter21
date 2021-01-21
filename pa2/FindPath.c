@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "List.h"
 #include"Graph.h"
 
@@ -21,7 +22,7 @@ int main(int argc, char * argv[]){
 
 	//int line_count;
 	FILE *in, *out;
-	char line[MAX_LEN];
+	//char line[MAX_LEN];
 
 	// check command line for correct number of arguments
 	if( argc != 3 ){
@@ -42,10 +43,47 @@ int main(int argc, char * argv[]){
 		exit(1);
 	}
 	
-	char* x;
-	x = fgets(line, MAX_LEN, in);
-	fprintf(out, "%s", x);
-
+	int n, x, y;
+	fscanf(in, "%d", &n);
+	Graph G = newGraph(n);
+	while(!feof (in)) {
+		fscanf (in, "%d %d", &x, &y);
+		if((x == 0) || (y == 0)) {
+			break;
+		}
+		addEdge(G, x, y);
+	}
+	printGraph(out, G);
+	
+	while(!feof (in)) {
+		fscanf (in, "%d %d", &x, &y);
+		if((x == 0) || (y == 0)) {
+			break;
+		}
+		fprintf(out, "\n");
+		BFS(G, x);
+		List L = newList();
+		if(getDist(G, y) != INF) {
+			if(getDist(G, y) == 0) {
+				fprintf(out, "The distance from %d to %d is %d\n", x, y, getDist(G, y));
+				fprintf(out, "A shortest %d-%d path is: %d\n", x, y, x);
+			}
+			else {
+				getPath(L, G, y);
+				fprintf(out, "The distance from %d to %d is %d\n", x, y, getDist(G, y));
+				fprintf(out, "A shortest %d-%d path is: ", x, y);
+				printList(out, L);
+			}
+		}
+		else {
+			fprintf(out, "The distance from %d to %d is infinity\n", x, y);
+			fprintf(out, "No %d-%d path exists\n", x, y);
+			
+		}
+		freeList(&L);
+	}
+	
+	freeGraph(&G);
 	// close files 
 	fclose(in);
 	fclose(out);

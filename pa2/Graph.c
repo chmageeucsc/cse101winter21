@@ -23,7 +23,6 @@
 
 // extras ---------------------------------------------------------------------
 
-int bfs_source = NIL;
 bool bfs_on = false;
 
 // structs --------------------------------------------------------------------
@@ -114,7 +113,7 @@ int getSource(Graph G) {
 		exit(EXIT_FAILURE);
 	}
 	if(bfs_on == true) {
-		return bfs_source;
+		return G->source;
 	}
 	return NIL;
 }
@@ -165,15 +164,16 @@ void getPath(List L, Graph G, int u) {
 		printf("Graph Error: calling getPath() out of bounds\n");
 		exit(EXIT_FAILURE);
 	}
-	while(G->p[u] != getSource(G)) {
-		if(G->p[u] == NIL) {
-			append(L, -1);
-			break;
-		}
-		else{
-			append(L, G->p[u]);
-			getPath(L, G, G->p[u]);
-		}
+	
+	if (u == getSource(G)) {
+		append(L, u);
+	}
+	else if (G->p[u] == NIL) {
+		append(L, NIL);
+	}
+	else {
+		getPath(L, G, G->p[u]);
+		append(L, u);
 	}
 }
 
@@ -244,7 +244,7 @@ void addArc(Graph G, int u, int v) {	// one way
 }
 
 void BFS(Graph G, int s) {
-	bfs_source = s;
+	G->source = s;
 	for(int i = 1; i <= getOrder(G); i++) {
 		if (i != s){
 			G->color[i] = WHITE;

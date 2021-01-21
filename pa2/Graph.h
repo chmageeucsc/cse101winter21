@@ -25,7 +25,6 @@
 
 // extras ---------------------------------------------------------------------
 
-extern int bfs_source;
 extern bool bfs_on;
 
 typedef struct GraphObj* Graph;

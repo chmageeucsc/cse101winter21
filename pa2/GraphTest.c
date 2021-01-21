@@ -19,7 +19,6 @@
 
 int main(void) {
 	Graph A = newGraph(100);
-	
 	/*addArc(A, 64, 4);
 	addArc(A, 64, 3);
 	addArc(A, 42, 2);

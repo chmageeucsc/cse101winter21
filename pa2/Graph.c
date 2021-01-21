@@ -66,12 +66,13 @@ Graph newGraph(int n) {
 	G->size = 0;
 	G->source = NIL;
 	G->adj = malloc(sizeof(List)*(n+1));	// list of neighbors of each vertex
-	for (int i = 1; i <= getOrder(G); i++){
-		G->adj[i] = newList();
-	}
 	G->color = (int*)calloc(G->order + 1, sizeof(int));	// color for each vertex
 	G->p = (int*)calloc(G->order + 1, sizeof(int));		// parent of each vertex
 	G->d = (int*)calloc(G->order + 1, sizeof(int));		// distance from source to each vertex
+	for (int i = 1; i <= getOrder(G); i++){
+		G->adj[i] = newList();
+		G->d[i] = INF;
+	}
 	return G;
 }
 
@@ -257,7 +258,7 @@ void BFS(Graph G, int s) {
 	G->p[s] = NIL;
 	List L = newList();
 	append(L,s);
-	while(L->front != NULL) {
+	while(length(L) != 0) {
 		int x = front(L);
 		deleteFront(L);
 		for(moveFront(G->adj[x]); index(G->adj[x]) >= 0; moveNext(G->adj[x])) {

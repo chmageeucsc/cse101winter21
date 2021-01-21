@@ -73,6 +73,7 @@ int main(int argc, char * argv[]){
 				fprintf(out, "The distance from %d to %d is %d\n", x, y, getDist(G, y));
 				fprintf(out, "A shortest %d-%d path is: ", x, y);
 				printList(out, L);
+				fprintf(out, "\n");
 			}
 		}
 		else {

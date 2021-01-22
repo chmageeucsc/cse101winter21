@@ -6,7 +6,6 @@
 // GraphTest.c
 // Tester file for Graph
 // 
-// {printf("inf >:( \n");}
 //-----------------------------------------------------------------------------
 
 #include <stdlib.h>
@@ -18,54 +17,162 @@
 #include "Graph.h"
 
 int main(void) {
-	Graph A = newGraph(100);
-	/*addArc(A, 64, 4);
-	addArc(A, 64, 3);
-	addArc(A, 42, 2);
-	addArc(A, 2, 64);
-	addArc(A, 4, 2);
-	addArc(A, 3, 42);
-	BFS(A, 3);
-	getPath(L, A, 64);
-	printList(stdout, L);
-	printf("\n");
-	append(C, 3);
-	append(C, 42);
-	append(C, 2);
-	append(C, 64);
-	if (!equals(L, C)) {printf("equal 1 \n");}
-	moveFront(L);
-	BFS(A, 2);
-	getPath(L, A, 2);
-	append(C, 2);
-	if (!equals(L, C)) {printf("equal 2 \n");}
-	getPath(L, A, 99);
-	if (equals(L, C)) {printf("equal 3 \n");}
-	clear(L);
-	clear(C);
-	append(C, NIL);
-	BFS(A, 99);
-	getPath(L, A, 2);
-	if (!equals(C, L)) {printf("equal 4 \n");}*/
+	Graph G = newGraph(10);
+	List L = newList();
 	
-	/*for (int i = 1; i <= 100; i++) {
-		if (getDist(A, i) != INF) {printf("0 inf >:( %d\n", getDist(A, i));}
+	addEdge(G, 9, 10);
+	addEdge(G, 5, 6);
+	addEdge(G, 2, 5);
+	addArc(G, 1, 2);
+	addArc(G, 2, 4);
+	addArc(G, 5, 3);
+	addArc(G, 3, 7);
+	addArc(G, 4, 7);
+	addArc(G, 6, 8);
+	
+	printGraph(stdout, G);
+	
+	printf("\nBefore BFS\n\n");
+	
+	printf("Vertices: %d\n", getOrder(G));
+	printf("Edges: %d\n", getSize(G));
+	printf("Most Recent Source: %d\n", getSource(G));
+	printf("Parent of 3: %d\n", getParent(G, 3));
+	printf("Distance from Source %d to 3: %d\n", getSource(G), getDist(G, 3));
+	
+	if(getDist(G, 3) != INF) {
+		if(getDist(G, 3) == 0) {
+			printf("The distance from %d to %d is %d\n", getSource(G), 3, getDist(G, 3));
+			printf("A shortest %d-%d path is: %d\n", getSource(G), 3, getSource(G));
+		}
+		else {
+			getPath(L, G, 3);
+			printf("The distance from %d to %d is %d\n", getSource(G), 3, getDist(G, 3));
+			printf("A shortest %d-%d path is: ", getSource(G), 3);
+			printList(stdout, L);
+			printf("\n");
+		}
 	}
-	addEdge(A, 64, 4);
-	addEdge(A, 64, 3);
-	addEdge(A, 42, 2);
-	addEdge(A, 2, 64);
-	addEdge(A, 4, 2);
-	addEdge(A, 3, 42);
-	BFS(A, 64);
-	if (getDist(A, 64) != 0) {printf("0 >:( %d\n", getDist(A, 64));}
-	if (getDist(A, 2) != 1) {printf("2 >:( %d\n", getDist(A, 2));}
-	BFS(A, 4);
-	if (getDist(A, 42) != 2) {printf("4 >:( %d\n", getDist(A, 42));}
-	if (getDist(A, 43) != INF) {printf("1 inf >:( %d\n", getDist(A, 43));}
-	BFS(A, 99);
-	if (getDist(A, 64) != INF) {printf("2 inf >:( %d\n", getDist(A, 64));}*/
+	else {
+		printf("The distance from %d to %d is infinity\n", getSource(G), 3);
+		printf("No %d-%d path exists\n", getSource(G), 3);
+		
+	}
+	
+	if(getDist(G, 10) != INF) {
+		if(getDist(G, 10) == 0) {
+			printf("The distance from %d to %d is %d\n", getSource(G), 10, getDist(G, 10));
+			printf("A shortest %d-%d path is: %d\n", getSource(G), 10, getSource(G));
+		}
+		else {
+			getPath(L, G, 10);
+			printf("The distance from %d to %d is %d\n", getSource(G), 10, getDist(G, 10));
+			printf("A shortest %d-%d path is: ", getSource(G), 10);
+			printList(stdout, L);
+			printf("\n");
+		}
+	}
+	else {
+		printf("The distance from %d to %d is infinity\n", getSource(G), 10);
+		printf("No %d-%d path exists\n", getSource(G), 10);
+		
+	}
+	
+	if(getDist(G, 6) != INF) {
+		if(getDist(G, 6) == 0) {
+			printf("The distance from %d to %d is %d\n", getSource(G), 6, getDist(G, 6));
+			printf("A shortest %d-%d path is: %d\n", getSource(G), 6, getSource(G));
+		}
+		else {
+			getPath(L, G, 6);
+			printf("The distance from %d to %d is %d\n", getSource(G), 6, getDist(G, 6));
+			printf("A shortest %d-%d path is: ", getSource(G), 6);
+			printList(stdout, L);
+			printf("\n");
+		}
+	}
+	else {
+		printf("The distance from %d to %d is infinity\n", getSource(G), 6);
+		printf("No %d-%d path exists\n", getSource(G), 6);
+		
+	}
+	
+	BFS(G, 6);
+	
+	printf("\nAfter BFS\n\n");
+	
+	printf("Vertices: %d\n", getOrder(G));
+	printf("Edges: %d\n", getSize(G));
+	printf("Most Recent Source: %d\n", getSource(G));
+	printf("Parent of 3: %d\n", getParent(G, 3));
+	printf("Distance from Source %d to 3: %d\n", getSource(G), getDist(G, 3));
+	
+	if(getDist(G, 3) != INF) {
+		if(getDist(G, 3) == 0) {
+			printf("The distance from %d to %d is %d\n", getSource(G), 3, getDist(G, 3));
+			printf("A shortest %d-%d path is: %d\n", getSource(G), 3, getSource(G));
+		}
+		else {
+			getPath(L, G, 3);
+			printf("The distance from %d to %d is %d\n", getSource(G), 3, getDist(G, 3));
+			printf("A shortest %d-%d path is: ", getSource(G), 3);
+			printList(stdout, L);
+			printf("\n");
+		}
+	}
+	else {
+		printf("The distance from %d to %d is infinity\n", getSource(G), 3);
+		printf("No %d-%d path exists\n", getSource(G), 3);
+		
+	}
+	
+	if(getDist(G, 10) != INF) {
+		if(getDist(G, 10) == 0) {
+			printf("The distance from %d to %d is %d\n", getSource(G), 10, getDist(G, 10));
+			printf("A shortest %d-%d path is: %d\n", getSource(G), 10, getSource(G));
+		}
+		else {
+			getPath(L, G, 10);
+			printf("The distance from %d to %d is %d\n", getSource(G), 10, getDist(G, 10));
+			printf("A shortest %d-%d path is: ", getSource(G), 10);
+			printList(stdout, L);
+			printf("\n");
+		}
+	}
+	else {
+		printf("The distance from %d to %d is infinity\n", getSource(G), 10);
+		printf("No %d-%d path exists\n", getSource(G), 10);
+		
+	}
+	
+	if(getDist(G, 6) != INF) {
+		if(getDist(G, 6) == 0) {
+			printf("The distance from %d to %d is %d\n", getSource(G), 6, getDist(G, 6));
+			printf("A shortest %d-%d path is: %d\n", getSource(G), 6, getSource(G));
+		}
+		else {
+			getPath(L, G, 6);
+			printf("The distance from %d to %d is %d\n", getSource(G), 6, getDist(G, 6));
+			printf("A shortest %d-%d path is: ", getSource(G), 6);
+			printList(stdout, L);
+			printf("\n");
+		}
+	}
+	else {
+		printf("The distance from %d to %d is infinity\n", getSource(G), 6);
+		printf("No %d-%d path exists\n", getSource(G), 6);
+		
+	}
+	
+	makeNull(G);
+	
+	printf("\nAfter makeNull\n\n");
+	
+	printf("Edges: %d\n", getSize(G));
+	printGraph(stdout, G);
+	
 
-	freeGraph(&A);
+	freeList(&L);
+	freeGraph(&G);
 	return 0;
 }

@@ -3,9 +3,11 @@
 #
 #  make                     makes FindPath
 #  make GraphClient         makes GraphClient
+#  make GraphTest           makes GraphTest
 #  make clean               removes binaries
 #  make checkFind           tests FindPath for memory leaks on in3
 #  make checkClient         tests GraphClient for memory leaks
+#  make checkTest           tests GraphTest for memory leaks
 #------------------------------------------------------------------------------
 
 BASE_SOURCES   = Graph.c List.c
@@ -21,6 +23,9 @@ FindPath : FindPath.o $(BASE_OBJECTS)
 
 GraphClient : GraphClient.o $(BASE_OBJECTS)
 	$(LINK) GraphClient GraphClient.o $(BASE_OBJECTS)
+	
+GraphTest : GraphTest.o $(BASE_OBJECTS)
+	$(LINK) GraphTest GraphTest.o $(BASE_OBJECTS)
 
 FindPath.o : FindPath.c $(HEADERS)
 	$(COMPILE) FindPath.c
@@ -39,3 +44,6 @@ checkFind : FindPath
 
 checkClient : GraphClient
 	$(MEMCHECK) GraphClient
+	
+checkTest : GraphTest
+	$(MEMCHECK) GraphTest

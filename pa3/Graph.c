@@ -244,7 +244,7 @@ Graph transpose(Graph G) {
 	T->order = G->order;
 	for(int i = 1; i <= getOrder(G); i++){
 		for(moveFront(G->adj[i]); index(G->adj[i]) >= 0; moveNext(G->adj[i])) {
-			addArc(G, i, get(G->adj[i]));
+			addArc(T, get(G->adj[i]), i);
 		}
 	}
 	return T;

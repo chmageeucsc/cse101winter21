@@ -44,7 +44,7 @@ int getParent(Graph G, int u);
 int getDiscover(Graph G, int u);
 
 // pre: 1 <= u <= getOrder(G)
-void getFinish(Graph G, int u);
+int getFinish(Graph G, int u);
 
 /*** Manipulation procedures ***/
 

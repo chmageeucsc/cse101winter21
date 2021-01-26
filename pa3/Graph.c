@@ -50,8 +50,8 @@ typedef struct GraphObj {
 	List *adj; 	// list of neighbors of each vertex
 	int *color;	// color for each vertex
 	int *p;		// parent of each vertex
-	int *dt;	// discover time for each vertex
-	int *ft;	// finish time for each vertex
+	int *d;	// discover time for each vertex
+	int *f;	// finish time for each vertex
 } GraphObj;
 
 /*** Constructors-Destructors ***/
@@ -63,11 +63,12 @@ Graph newGraph(int n) {
 	G->adj = malloc(sizeof(List)*(n+1));	// list of neighbors of each vertex
 	G->color = (int*)calloc(G->order + 1, sizeof(int));	// color for each vertex
 	G->p = (int*)calloc(G->order + 1, sizeof(int));		// parent of each vertex
-	G->dt = (int*)calloc(G->order + 1, sizeof(int));	// discover time for each vertex
-	G->ft = (int*)calloc(G->order + 1, sizeof(int));	// finish time for each vertex
+	G->d = (int*)calloc(G->order + 1, sizeof(int));	// discover time for each vertex
+	G->f = (int*)calloc(G->order + 1, sizeof(int));	// finish time for each vertex
 	for (int i = 1; i <= getOrder(G); i++){
 		G->adj[i] = newList();
-		G->dt[i] = INF;
+		G->d[i] = UNDEF;
+		G->f[i] = UNDEF;
 	}
 	return G;
 }
@@ -80,7 +81,8 @@ void freeGraph(Graph* pG) {
 		free((*pG)->adj);
 		free((*pG)->color);
 		free((*pG)->p);
-		free((*pG)->dt);
+		free((*pG)->d);
+		free((*pG)->f);
 	}
 	free(*pG);
 	*pG = NULL;
@@ -119,39 +121,29 @@ int getParent(Graph G, int u) {
 }
 
 // pre: 1 <= u <= getOrder(G)
-void getDiscover(Graph G, int u) {
+int getDiscover(Graph G, int u) {
 	if(G == NULL){
-		printf("Graph Error: calling getPath() on NULL Graph reference\n");
+		printf("Graph Error: calling getDiscover() on NULL Graph reference\n");
 		exit(EXIT_FAILURE);
 	}
 	if(u < 1 || u > getOrder(G)) {
-		printf("Graph Error: calling getPath() out of bounds\n");
+		printf("Graph Error: calling getDiscover() out of bounds\n");
 		exit(EXIT_FAILURE);
 	}
-	
-	if (u == getSource(G)) {
-		append(L, u);
-	}
-	else if (G->p[u] == NIL) {
-		append(L, NIL);
-	}
-	else {
-		getPath(L, G, G->p[u]);
-		append(L, u);
-	}
+	return G->d[u];
 }
 
 // pre: 1 <= u <= getOrder(G)
-void getDiscover(Graph G, int u) {
+int getFinish(Graph G, int u) {
 	if(G == NULL){
-		printf("Graph Error: calling getPath() on NULL Graph reference\n");
+		printf("Graph Error: calling getFinish() on NULL Graph reference\n");
 		exit(EXIT_FAILURE);
 	}
 	if(u < 1 || u > getOrder(G)) {
-		printf("Graph Error: calling getPath() out of bounds\n");
+		printf("Graph Error: calling getFinish() out of bounds\n");
 		exit(EXIT_FAILURE);
 	}
-	return G->disc[u];
+	return G->f[u];
 }
 
 /*** Manipulation procedures ***/
@@ -209,23 +201,64 @@ void addArc(Graph G, int u, int v) {	// one way
 	}
 }
 
-void visit(int x) {
-	
+void visit(int x, int *time, Graph G, List s) {
+	G->d[x] = ++(*time);		// discover x
+	G->color[x] = GRAY;
+	for(moveFront(G->adj[x]); index(G->adj[x]) >= 0; moveNext(G->adj[x])) {
+		if(G->color[get(G->adj[x])] == WHITE) {
+			G->p[get(G->adj[x])] = x;
+			visit(get(G->adj[x]),(int*)time, G, s);
+		}
+	}
+	G->color[x] = BLACK;
+	G->f[x] = ++(*time);		// finish x
+	append(s, x);
 }
 
-// pre: length(S) == getOrder(G)
+// pre: length(s) == getOrder(G)
 void DFS(Graph G, List s) {
+	if(length(s) != getOrder(G)) {
+		printf("Graph Error: calling DFS() with unacceptable List S\n");
+		exit(EXIT_FAILURE);
+	}
 	
+	for(int i = 1; i <= getOrder(G); i++) {
+		G->color[i] = WHITE;
+		G->p[i] = NIL;
+	}
+	int time = 0;
+	for(moveFront(s); index(s) >= 0; moveNext(s)) {
+		if(G->color[get(s)] == WHITE) {
+			visit(get(s), &time, G, s);
+		}
+	}
 }
 
 /*** Other operations ***/
 
 Graph transpose(Graph G) {
-	
+	Graph T = newGraph(getOrder(G));
+	T->order = G->order;
+	for(int i = 1; i <= getOrder(G); i++){
+		for(moveFront(G->adj[i]); index(G->adj[i]) >= 0; moveNext(G->adj[i])) {
+			addArc(G, get(T->adj[i]), get(G->adj[i]));
+		}
+	}
+	return T;
 }
 
 Graph copyGraph(Graph G) {
+	Graph copy = newGraph(getOrder(G));
+	copy->order = G->order;
+	copy->size = G->size;
+	for(int i = 1; i <= getOrder(G); i++){
+		copy->color[i] = G->color[i];
+		copy->d[i] = G->d[i];
+		copy->f[i] = G->f[i];
+		copy->adj[i] = copyList(G->adj[i]);
+	}
 	
+	return copy;
 }
 
 void printGraph(FILE* out, Graph G) {

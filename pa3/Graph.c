@@ -212,7 +212,7 @@ void visit(int x, int *time, Graph G, List s) {
 	}
 	G->color[x] = BLACK;
 	G->f[x] = ++(*time);		// finish x
-	append(s, x);
+	prepend(s, x);
 }
 
 // pre: length(s) == getOrder(G)
@@ -232,6 +232,9 @@ void DFS(Graph G, List s) {
 			visit(get(s), &time, G, s);
 		}
 	}
+	for(int i = 0; i < getOrder(G); i++) {
+		deleteBack(s);
+	}
 }
 
 /*** Other operations ***/
@@ -241,7 +244,7 @@ Graph transpose(Graph G) {
 	T->order = G->order;
 	for(int i = 1; i <= getOrder(G); i++){
 		for(moveFront(G->adj[i]); index(G->adj[i]) >= 0; moveNext(G->adj[i])) {
-			addArc(G, get(T->adj[i]), get(G->adj[i]));
+			addArc(G, i, get(G->adj[i]));
 		}
 	}
 	return T;

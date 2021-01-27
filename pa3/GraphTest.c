@@ -10,7 +10,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "List.h"
 #include "Graph.h"
 
 int main(void) {
@@ -59,6 +58,11 @@ int main(void) {
 	for(int i = 1; i <= 8; i++){
 		printf("%d: %2d %2d %2d\n", i, getDiscover(T, i), getFinish(T, i), getParent(T, i));
 	}
+	
+	freeGraph(&G);
+	freeGraph(&T);
+	freeGraph(&C);
+	freeList(&S);
 
 	return 0;
 }

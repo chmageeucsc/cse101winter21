@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include "List.h"
 
-#define INF -1
+#define UNDEF -1
 #define NIL 0
 #define WHITE 1
 #define GRAY 2

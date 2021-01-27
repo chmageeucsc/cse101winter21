@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "List.h"
 #include"Graph.h"
+#define NIL 0
 
  #define MAX_LEN 100
 
@@ -63,7 +64,17 @@ int main(int argc, char * argv[]){
 	T = transpose(G);
 	DFS(T,S);
 	
+	int scc = 0;
+	for(int i = 1; i <= getOrder(G); i++) {
+		if(getParent(T, i) == NIL) {
+			scc++;
+		}
+	}
 	
+	fprintf(out, "G contains %d strongly connected components:\n", scc);
+	for(int i = 1; i <= scc; i++) {
+		fprintf(
+	}
 	
 	freeGraph(&G);
 	// close files 

@@ -10,7 +10,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "List.h"
 #include "Graph.h"
 
 #define UNDEF -1
@@ -254,6 +253,9 @@ Graph copyGraph(Graph G) {
 	Graph copy = newGraph(getOrder(G));
 	copy->order = G->order;
 	copy->size = G->size;
+	for(int i = 1; i <= getOrder(G); i++){
+		freeList(&copy->adj[i]);
+	}	
 	for(int i = 1; i <= getOrder(G); i++){
 		copy->color[i] = G->color[i];
 		copy->d[i] = G->d[i];

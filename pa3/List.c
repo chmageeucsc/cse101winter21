@@ -202,6 +202,7 @@ void moveBack(List L) {
 void movePrev(List L) {
 	if (L->cursor != NULL && L->cursor == L->front) {
 		L->cursor = NULL;
+		L->index = -1;
 	}
 	else if(L->cursor != NULL && L->cursor != L->front) {
 		L->cursor = L->cursor->prev;
@@ -212,6 +213,7 @@ void movePrev(List L) {
 void moveNext(List L) {
 	if (L->cursor != NULL && L->cursor == L->back) {
 		L->cursor = NULL;
+		L->index = -1;
 	}
 	else if(L->cursor != NULL && L->cursor != L->back) {
 		L->cursor = L->cursor->next;

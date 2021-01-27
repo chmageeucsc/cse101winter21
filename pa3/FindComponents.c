@@ -71,11 +71,42 @@ int main(int argc, char * argv[]){
 		}
 	}
 	
-	fprintf(out, "G contains %d strongly connected components:\n", scc);
-	for(int i = 1; i <= scc; i++) {
-		fprintf(
-	}
+	List L = newList();
+	append(L, 0);
+	moveBack(L);
 	
+	for(moveBack(S); index(S) >= 0;movePrev(S)){
+		while((getParent(T, get(S)) != NIL)) {
+			insertAfter(L, get(S));
+			movePrev(S);
+		}
+		insertAfter(L, get(S));
+		moveBack(L);
+	}
+	deleteFront(L);
+	moveFront(L);
+	
+	fprintf(out, "G contains %d strongly connected components:", scc);
+	for(int i = 1; i <= scc; i++) {
+		fprintf(out, "\n");
+		fprintf(out, "Component %d:", i);
+		
+		if(getParent(T, get(L)) == NIL) {
+			fprintf(out, " %d", get(L));
+			moveNext(L);
+		}
+		if(index(L) < 0) {
+			break;
+		}
+		while(getParent(T, get(L)) != NIL) {
+			fprintf(out, " %d", get(L));
+			moveNext(L);
+		}
+	}
+
+	freeList(&L);
+	freeList(&S);
+	freeGraph(&T);
 	freeGraph(&G);
 	// close files 
 	fclose(in);

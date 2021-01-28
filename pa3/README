@@ -4,7 +4,7 @@ Winter 2021 CSE 101 pa3
 1/25/2021
 
 README has all the file names in one place.
-Files include: List.c, List.h, Graph.c, Graph.h, GraphTest.c, FindComponents.c, Makefile.h, and README
+Files include: List.c, List.h, Graph.c, Graph.h, GraphTest.c, FindComponents.c, Makefile, and README
 These files are for pa3.
 
 There is an extra local function in Graph.c, visit(int x, int time, Graph G, List s), needed for DFS().

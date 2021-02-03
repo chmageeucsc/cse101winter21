@@ -33,8 +33,10 @@ List::Node::Node(int x){
 
 // Creates new List in the empty state.
 List::List() {
-	frontDummy = nullptr; 
-	backDummy = nullptr;
+	frontDummy = new Node(-1);
+	backDummy = new Node(-1);
+	frontDummy->next = backDummy;
+	backDummy->prev = frontDummy;
 	beforeCursor = nullptr;
 	afterCursor = nullptr;
 	pos_cursor = 0;
@@ -50,7 +52,7 @@ List::List(const List& L) {
 	pos_cursor = 0;
 	num_elements = 0;
 	
-	Node* N = L.frontDummy;
+	Node* N = L.frontDummy->next;
 	while (N != backDummy) {
 		this->insertBefore(N->data);
 		N = N->next;
@@ -340,14 +342,14 @@ bool List::equals(const List& R) {
 
 // operator<<()
 // Inserts string representation of L into stream.
-friend std::ostream& operator<<( std::ostream& stream, List& L ) {
+std::ostream& operator<<( std::ostream& stream, List& L ) {
 	return stream << L.List::to_string();
 }
 
 // operator==()
 // Returns true if and only if A is the same integer sequence as B. The 
 // cursors in both Lists are unchanged are unchanged.
-friend bool operator==( List& A, const List& B ) {
+bool operator==( List& A, const List& B ) {
 	return A.List::equals(B);
 }
 

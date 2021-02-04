@@ -37,16 +37,16 @@ List::List() {
 	backDummy = new Node(-1);
 	frontDummy->next = backDummy;
 	backDummy->prev = frontDummy;
-	beforeCursor = nullptr;
-	afterCursor = nullptr;
+	beforeCursor = frontDummy;
+	afterCursor = backDummy;
 	pos_cursor = 0;
 	num_elements = 0;
 }
 
 // Copy constructor.
 List::List(const List& L) {
-	frontDummy = nullptr; 
-	backDummy = nullptr;
+	frontDummy = new Node(-1);
+	backDummy = new Node(-1);
 	beforeCursor = frontDummy;
 	afterCursor = backDummy;
 	pos_cursor = 0;
@@ -148,6 +148,7 @@ int List::moveNext() {
 	afterCursor = afterCursor->next;
 	beforeCursor->prev = N;
 	afterCursor->prev = beforeCursor;
+	pos_cursor++;
 	return beforeCursor->data;
 }
 
@@ -160,11 +161,12 @@ int List::movePrev() {
 		cout << "List Error: calling movePrev() out of bounds" << endl;
 		exit(-1);
 	}
-	Node* N = afterCursor;
+	//Node* N = afterCursor;
 	beforeCursor = beforeCursor->prev;
 	afterCursor = afterCursor->prev;
-	afterCursor->next = N;
+	//afterCursor->next = N;
 	beforeCursor->next = afterCursor;
+	pos_cursor--;
 	return afterCursor->data;
 }
 
@@ -183,6 +185,7 @@ void List::insertAfter(int x) {
 // Inserts x before cursor.
 void List::insertBefore(int x) {
 	Node* N = new Node(x);
+	beforeCursor->next = N;
 	N->prev = beforeCursor;
 	N->next = afterCursor;
 	afterCursor->prev = N;
@@ -309,11 +312,13 @@ List List::concat(const List& L) {
 // separated sequence of elements, surrounded by parentheses.
 std::string List::to_string() {
 	Node* N = nullptr;
-	string s = "";
-
-	for(N=frontDummy; N!=nullptr; N=N->next){
-		s += "("+std::to_string(N->data)+"), ";
+	string s = "(";
+	N=frontDummy->next;
+	s += std::to_string(N->data);
+	for(N=frontDummy->next->next; N!=backDummy; N=N->next){
+		s += ", "+std::to_string(N->data);
 	}
+	s += ")";
 
 	return s;
 }

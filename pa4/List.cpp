@@ -53,7 +53,7 @@ List::List(const List& L) {
 	num_elements = 0;
 	
 	Node* N = L.frontDummy->next;
-	while (N != backDummy) {
+	while (N != L.backDummy) {
 		this->insertBefore(N->data);
 		N = N->next;
 	}
@@ -62,8 +62,8 @@ List::List(const List& L) {
 // Destructor
 List::~List() {
 	this->clear();
-	this->eraseBefore();
-	this->eraseAfter();
+	delete this->frontDummy;
+	delete this->backDummy;
 }
 
 
@@ -258,13 +258,42 @@ int List::findPrev(int x) {
 // elements, i.e. it lies between the same two retained elements that it 
 // did before cleanup() was called.
 void List::cleanup() {
+	/*int count = pos_cursor;
+	int tempPos = pos_cursor;
+	Node* tempBefore = beforeCursor;
+	Node* tempAfter = afterCursor;
 	
 	for (int i = 1; i < size(); i++) {
 		moveFront();
 		if (findNext(i) != -1) {
-			eraseBefore();
+			for (int j = i; j < size(); j++) {
+				if (findNext(j) != -1) {
+					count--;
+				}
+			}
 		}
 	}
+	
+	pos_cursor = tempPos;
+	beforeCursor = tempBefore;
+	afterCursor = tempAfter;*/
+	
+	for (int i = 1; i < size(); i++) {
+		moveFront();
+		if (findNext(i) != -1) {
+			for (int j = i; j < size(); j++) {
+				if (findNext(j) != -1) {
+					eraseBefore();
+				}
+			}
+		}
+	}
+	/*moveFront();
+	for (int i = 0; i < count; i++) {
+		beforeCursor = beforeCursor->next;
+		afterCursor = afterCursor->next;
+		pos_cursor = i;
+	}*/
 }
 
 // clear()
@@ -282,13 +311,13 @@ void List::clear() {
 // (position 0).
 List List::concat(const List& L) {
 	List C;
-	Node* N = this->frontDummy;
+	Node* N = this->frontDummy->next;
 	Node* M = L.frontDummy->next;
 	while (N != backDummy) {
 		C.insertBefore(N->data);
 		N = N->next;
 	}
-	while (M != backDummy) {
+	while (M != L.backDummy) {
 		C.insertBefore(M->data);
 		M = M->next;
 	}
@@ -355,6 +384,7 @@ bool operator==( List& A, const List& B ) {
 // operator=()
 // Overwrites the state of this List with state of L.
 List& List::operator=( const List& L ) {
+	
 	if( this != &L ){ // not self assignment
 		// make a copy of L
 		List temp = L;

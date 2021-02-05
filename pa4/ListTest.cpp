@@ -1,6 +1,11 @@
 //-----------------------------------------------------------------------------
+//
+// Chantel Gee, chmagee
+// 2021 Winter CSE 101 pa4
+// 
 // ListTest.cpp
-// A test client for List ADT
+// Test file for List ADT
+// 
 //-----------------------------------------------------------------------------
 #include<iostream>
 #include<string>
@@ -95,6 +100,11 @@ int main(){
    cout << "A = " << A << endl;
    cout << A.position() << endl;
    cout << endl;
+   
+   E = A;
+   cout << "E==A is " << (E==A?"true":"false") << endl;
+   List F;
+   F = A.concat(B);
 
 	return(0);
 }

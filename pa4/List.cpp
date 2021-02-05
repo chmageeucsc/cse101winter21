@@ -258,25 +258,8 @@ int List::findPrev(int x) {
 // elements, i.e. it lies between the same two retained elements that it 
 // did before cleanup() was called.
 void List::cleanup() {
-	/*int count = pos_cursor;
+	int count = 0;
 	int tempPos = pos_cursor;
-	Node* tempBefore = beforeCursor;
-	Node* tempAfter = afterCursor;
-	
-	for (int i = 1; i < size(); i++) {
-		moveFront();
-		if (findNext(i) != -1) {
-			for (int j = i; j < size(); j++) {
-				if (findNext(j) != -1) {
-					count--;
-				}
-			}
-		}
-	}
-	
-	pos_cursor = tempPos;
-	beforeCursor = tempBefore;
-	afterCursor = tempAfter;*/
 	
 	for (int i = 1; i < size(); i++) {
 		moveFront();
@@ -285,15 +268,21 @@ void List::cleanup() {
 				if (findNext(j) != -1) {
 					eraseBefore();
 				}
+				else {
+					if (pos_cursor <= tempPos) {
+						count++;
+					}
+				}
 			}
 		}
 	}
-	/*moveFront();
+	
+	moveFront();
 	for (int i = 0; i < count; i++) {
 		beforeCursor = beforeCursor->next;
 		afterCursor = afterCursor->next;
-		pos_cursor = i;
-	}*/
+	}
+	pos_cursor = count;
 }
 
 // clear()

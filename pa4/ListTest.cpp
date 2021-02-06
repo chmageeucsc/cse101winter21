@@ -15,45 +15,34 @@ using namespace std;
 
 int main() 
 { 
-	List A;
+	List A, B;
 	
-	A.insertAfter(200);
-    A.insertAfter(176);
-	A.insertAfter(15);
-	A.insertAfter(10);
-	A.insertAfter(5);
-	A.findNext(15);
-	A.eraseAfter();
-	if (A.position() != 3) {
-		cout << "Error: Position should be 3." << endl;
+	A.insertBefore(3);
+	A.insertBefore(3);
+	A.insertBefore(1);
+	A.insertBefore(3);
+	A.insertBefore(2);
+	A.insertBefore(2);
+	A.insertBefore(1);
+	A.insertBefore(4);
+	B.insertBefore(3);
+	B.insertBefore(1);
+	B.insertBefore(2);
+	if (A.equals(B)) {
+		cout << "Error : A != B" << endl;
 	}
-	A.insertAfter(175);
-	A.eraseAfter();
-	if (A.position() != 3) {
-		cout << "Error: Position should be 3." << endl;
+	cout << "A = " << A << endl;
+	cout << "B = " << B << endl;
+	A.cleanup();
+	cout << "A = " << A << endl;
+	cout << "B = " << B << endl;
+	if (A.equals(B)) {
+		cout << "Error : A != B" << endl;
 	}
-	A.insertBefore(50);
-	A.insertBefore(15);
-	if (A.position() != 5) {
-		cout << "Error: Position should be 5." << endl;
-	}
-	A.findPrev(15);
-	A.eraseAfter();
-	if (A.position() != 4) {
-		cout << "Error: Position should be 4." << endl;
-	}
-	A.findPrev(15);
-	if (A.position() != 2) {
-		cout << "Error: Position should be 2." << endl;
-	}
-	A.moveFront();
-	A.eraseAfter();
-	A.eraseAfter();
-	A.eraseAfter();
-	A.eraseAfter();
-	A.eraseAfter();
-	if (A.position() != 0) {
-		cout << "Error: Position should be 0." << endl;
+	A.moveBack();
+	A.eraseBefore();
+	if (!A.equals(B)) {
+		cout << "Error : A = B" << endl;
 	}
     return 0; 
 }

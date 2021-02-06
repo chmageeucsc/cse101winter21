@@ -258,7 +258,28 @@ int List::findPrev(int x) {
 // elements, i.e. it lies between the same two retained elements that it 
 // did before cleanup() was called.
 void List::cleanup() {
-	int count = 0;
+	int tempPos = pos_cursor;
+	cout << "tempPos = " << tempPos << endl;
+	for (int i = 1; i < size(); i++) {
+		moveFront();
+		if (findNext(peekNext()) != -1) {
+			for (int j = i; j < size(); j++) {
+				if (findNext(peekNext()) != -1) {
+					eraseBefore();
+					if (position() < tempPos) {
+						tempPos--;
+					}
+				}
+			}
+		}
+	}
+	cout << "tempPos = " << tempPos << endl;
+	moveFront();
+	for (int i = 0; i < tempPos; i++) {
+		moveNext();
+	}
+	
+	/*int count = 0;
 	int tempPos = pos_cursor;
 	for (moveFront(); position() < size(); moveNext()) {
 		if (findNext(peekNext()) != -1) {
@@ -280,7 +301,7 @@ void List::cleanup() {
 		beforeCursor = beforeCursor->next;
 		afterCursor = afterCursor->next;
 	}
-	pos_cursor = count;
+	pos_cursor = count;*/
 }
 
 // clear()
@@ -308,9 +329,7 @@ List List::concat(const List& L) {
 		C.insertBefore(M->data);
 		M = M->next;
 	}
-	C.pos_cursor = 0;
-	C.beforeCursor = frontDummy;
-	C.afterCursor = frontDummy->next;
+	C.moveFront();
 	return C;
 }
 
@@ -383,10 +402,10 @@ List& List::operator=( const List& L ) {
 		std::swap(afterCursor, temp.afterCursor);
 		std::swap(pos_cursor, temp.pos_cursor);
 		std::swap(num_elements, temp.num_elements);
-   }
+	}
+	this->moveFront();
+	// return this with the new data installed
+	return *this;
 
-   // return this with the new data installed
-   return *this;
-
-   // the copy, if there is one, is deleted upon return
+	// the copy, if there is one, is deleted upon return
 }

@@ -258,13 +258,13 @@ int List::findPrev(int x) {
 // elements, i.e. it lies between the same two retained elements that it 
 // did before cleanup() was called.
 void List::cleanup() {
+	Node* curr = frontDummy->next;
 	int tempPos = pos_cursor;
-	cout << "tempPos = " << tempPos << endl;
-	for (int i = 1; i < size(); i++) {
+	for (int i = 1; i <= size(); i++) {
 		moveFront();
-		if (findNext(peekNext()) != -1) {
-			for (int j = i; j < size(); j++) {
-				if (findNext(peekNext()) != -1) {
+		if (findNext(curr->data) != -1) {
+			for (int j = i+1; j <= size(); j++) {
+				if (findNext(curr->data) != -1) {
 					eraseBefore();
 					if (position() < tempPos) {
 						tempPos--;
@@ -272,42 +272,18 @@ void List::cleanup() {
 				}
 			}
 		}
+		curr = curr->next;
 	}
-	cout << "tempPos = " << tempPos << endl;
 	moveFront();
 	for (int i = 0; i < tempPos; i++) {
 		moveNext();
 	}
-	
-	/*int count = 0;
-	int tempPos = pos_cursor;
-	for (moveFront(); position() < size(); moveNext()) {
-		if (findNext(peekNext()) != -1) {
-			for (int j = position(); j < size(); j++) {
-				if (findNext(peekNext()) != -1) {
-					eraseBefore();
-				}
-				else {
-					if (pos_cursor <= tempPos) {
-						count++;
-					}
-				}
-			}
-		}
-	}
-	
-	moveFront();
-	for (int i = 0; i < count; i++) {
-		beforeCursor = beforeCursor->next;
-		afterCursor = afterCursor->next;
-	}
-	pos_cursor = count;*/
 }
 
 // clear()
 // Deletes all elements in this List, setting it to the empty state.
 void List::clear() {
-	this->moveFront();
+	moveFront();
 	while (afterCursor != backDummy) {
 		eraseAfter();
 	}

@@ -62,8 +62,8 @@ List::List(const List& L) {
 // Destructor
 List::~List() {
 	clear();
-	delete frontDummy;
-	delete backDummy;
+	delete this->frontDummy;
+	delete this->backDummy;
 }
 
 
@@ -260,12 +260,10 @@ int List::findPrev(int x) {
 void List::cleanup() {
 	int count = 0;
 	int tempPos = pos_cursor;
-	
-	for (int i = 1; i < size(); i++) {
-		moveFront();
-		if (findNext(i) != -1) {
-			for (int j = i; j < size(); j++) {
-				if (findNext(j) != -1) {
+	for (moveFront(); position() < size(); moveNext()) {
+		if (findNext(peekNext()) != -1) {
+			for (int j = position(); j < size(); j++) {
+				if (findNext(peekNext()) != -1) {
 					eraseBefore();
 				}
 				else {

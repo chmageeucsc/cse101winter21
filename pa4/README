@@ -1,15 +1,10 @@
 Chantel Gee
 chmagee
 Winter 2021 CSE 101 pa4
-1/28/2021
+02/05/2021
 
 README has all the file names in one place.
 Files include: List.cpp, List.h, ListTest.cpp, Shuffle.cpp, Makefile, and README
-These files are for pa3.
+These files are for pa4.
 
-There is an extra local function in Graph.c, visit(int x, int time, Graph G, List s), needed for DFS().
-No global variables used for visit().
-visit() has a parameter int time to keep track of discover time and finishing time.
-visit() also has a parameter List s to access the List from DFS and append the finished vertices.
 
-pa3's Graph.c and Graph.h were taken from pa2 and modified to fit the current assignment.

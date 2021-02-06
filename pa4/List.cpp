@@ -61,9 +61,9 @@ List::List(const List& L) {
 
 // Destructor
 List::~List() {
-	this->clear();
-	delete this->frontDummy;
-	delete this->backDummy;
+	clear();
+	delete frontDummy;
+	delete backDummy;
 }
 
 

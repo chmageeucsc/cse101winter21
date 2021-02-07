@@ -284,7 +284,7 @@ void List::cleanup() {
 // Deletes all elements in this List, setting it to the empty state.
 void List::clear() {
 	moveFront();
-	while (afterCursor != backDummy) {
+	while (!isEmpty()) {
 		eraseAfter();
 	}
 }

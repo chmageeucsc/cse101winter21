@@ -7,6 +7,7 @@
 #  make clean          removes binary files
 #  make check1         runs valgrind on ListClient
 #  make check2         runs valgrind on Shuffle with command line argument 35
+#  make check3         runs valgrind on ListTest
 #------------------------------------------------------------------------------
 
 Shuffle : Shuffle.o List.o

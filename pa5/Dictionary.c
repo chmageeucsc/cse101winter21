@@ -29,7 +29,7 @@ typedef struct NodeObj {
 	VAL_TYPE val;
 	struct NodeObj* parent;			// prev node
 	struct NodeObj* left;		// next node
-	struct NodeObj* right_child;	// next node
+	struct NodeObj* right;	// next node
 } NodeObj;
 
 // private Node type
@@ -46,11 +46,13 @@ typedef struct DictionaryObj {
 
 // Constructors-Destructors ---------------------------------------------------
 
-Node newNode(int data){
+Node newNode(KEY_TYPE k, VAL_TYPE v){
 	Node N = malloc(sizeof(NodeObj));
-	N->data = data;
-	N->next = NULL;
-	N->prev = NULL;
+	N->key = k;
+	N->val = v;
+	N->parent = NULL;
+	N->left = NULL;
+	N->right = NULL;
 	return(N);
 }
 
@@ -70,11 +72,13 @@ void freeNode(Node* pN){
 Dictionary newDictionary(int unique) {
 	Dictionary D = malloc(sizeof(DictionaryObj));
 	D->NIL = NULL;
-	D->NIL->parent = NIL;
-	D->NIL->left = NIL;
-	D->NIL->right_child = NIL;
+	D->NIL->parent = D->NIL;
+	D->NIL->left = D->NIL;
+	D->NIL->right = D->NIL;
+	D->NIL->key = "%";
+	D->NIL->val = -70;
 	D->root = NULL;
-	D->root->parent = NIL;
+	D->root->parent = D->NIL;
 	D->size = 0;
 	D->cursor = NULL;
 	D->unique = unique;
@@ -84,7 +88,7 @@ Dictionary newDictionary(int unique) {
 // freeDictionary()
 // Frees heap memory associated with *pD, sets *pD to NULL.
 void freeDictionary(Dictionary* pD) {
-	
+	makeEmpty(* pD);
 	free(*pD);
 	*pD = NULL;
 }
@@ -105,47 +109,65 @@ int getUnique(Dictionary D) {
 	return (D->unique);
 }
 
+// treeSearch()
+// helper function for finding the node of key k
+Node treeSearch(Dictionary D, Node x, KEY_TYPE k) {
+	if ((x == D->NIL) || (k == x->key)) {
+		return x;
+		}
+	if (k < x->key) {
+		return (treeSearch(D, x->left, k));
+	}
+	else {return (treeSearch(D, x->right, k));}
+}
+
 // lookup()
 // If Dictionary D contains a (key, value) pair whose key matches k (i.e. if
 // KEY_CMP(key, k)==0), then returns value. If D contains no such pair, then
 // returns VAL_UNDEF.
 VAL_TYPE lookup(Dictionary D, KEY_TYPE k) {
-	/*Node x;
+	Node x;
 	x = D->root;
-	if ((x == NIL) || (k == x->key)) {
-		if (KEY_CMP(key, k) == 0) {
-			return k;
+	if ((x == D->NIL) || (k == x->key)) {
+		if (KEY_CMP(x->key, k) == 0) {
+			return x->val;
 		}
 		else {
 			return VAL_UNDEF;
 		}
 	}
-	else if (k < x->key) {
-		return (lookup(D, 
+	if (k < x->key) {
+		return ((treeSearch(D, x->left, k))->val);
 	}
-	*/
+	else {return ((treeSearch(D, x->right, k))->val);}
 }
 
 // treeMinimum()
 // helper function
-KEY_TYPE treeMinimum(KEY_TYPE k) {
-	if (k != NIL) {
-		while (k->left != NIL) {
-			k = k->left;
+KEY_TYPE treeMinimum(Dictionary D, KEY_TYPE k) {
+	Node x = D->root;
+	x = treeSearch(D, x, k);
+	if (x != D->NIL) {
+		while (x->left != D->NIL) {
+			x = x->left;
 		}
-		return k;
+		return x->key;
 	}
+	return D->NIL->key;
 }
 
 // treeMaximum()
 // helper function
-KEY_TYPE treeMaximum(KEY_TYPE k) {
-	if (k != NIL) {
-		while (k->right != NIL) {
-			k = k->right;
+KEY_TYPE treeMaximum(Dictionary D, KEY_TYPE k) {
+	Node x = D->root;
+	x = treeSearch(D, x, k);
+	if (x != D->NIL) {
+		while (x->right != D->NIL) {
+			x = x->right;
 		}
-		return k;
+		return x->key;
 	}
+	return D->NIL->key;
 }
 
 // Manipulation procedures ----------------------------------------------------
@@ -157,80 +179,33 @@ KEY_TYPE treeMaximum(KEY_TYPE k) {
 // is enforced. 
 void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
 	if (getUnique(D) == 1) {
-		if (lookup(D, k) == VAL_UNDEF) {
-			
-		}
-	}
-	Node x, y;
-	y = NIL;
-	x = D->root;
-	while (x != NIL) {
-		y = x;
-		if 
+		
 	}
 }
 
 // transplant()
 // helper function for delete
-void transplant(Dictionary D, KEY_TYPE k, KEY_TYPE l) {
-	if (k->parent == NIL) {
-		D->root = l;
-	}
-	else if (k == k->parent->left) {
-		k->parent->left = l;
-	}
-	else {
-		k->parent->right = l;
-	}
-	if (l != NIL) {
-		l->parent = k->parent;
-	}
+void transplant(Dictionary D, Node k, Node l) {
+	
 }
 
 // delete()
 // Remove the pair whose key is k from Dictionary D.
 // Pre: lookup(D,k)!=VAL_UNDEF (i.e. D contains a pair whose key is k.)
 void delete(Dictionary D, KEY_TYPE k) {
-	if (lookup(D,k) != VAL_UNDEF) {
-		if (k->left == NIL) {
-			transplant(D, k, k->right);
-		} 
-		else if (k->right == NIL) {
-			transplant(D, k, k->left);
-		}
-		else {
-			KEY_TYPE l;
-			l = treeMinimum(k->right);
-			if (l->parent != k) {
-				transplant(D, l, l->right);
-				l->right = k->right;
-				l->right->parent = l;
-			}
-			transplant(D, k, l);
-			l->left = k->left;
-			l->left->parent = l;
-		}
-	}
+	
 }
 
 // postOrderTreeWalk()
 // for deleting the nodes
 void postOrderTreeWalk(KEY_TYPE k) {
-	if (k != NIL) {
-		postOrderTreeWalk(k->left);
-		postOrderTreeWalk(k->right);
-		delete(D, k);
-	}
+	
 }
 
 // makeEmpty()
 // Reset Dictionary D to the empty state, containing no pairs.
 void makeEmpty(Dictionary D) {
-	Node x;
-	x = D->root;
-	if (x != NIL) {
-		postOrderTreeWalk(x);
-	}
+	
 }
 
 // beginForward()
@@ -238,7 +213,7 @@ void makeEmpty(Dictionary D) {
 // (as defined by the order operator KEY_CMP()), then returns the first
 // value. If D is empty, returns VAL_UNDEF. 
 VAL_TYPE beginForward(Dictionary D) {
-	
+	return 1;
 }
 
 // beginReverse()
@@ -246,14 +221,14 @@ VAL_TYPE beginForward(Dictionary D) {
 // (as defined by the order operator KEY_CMP()), then returns the last
 // value. If D is empty, returns VAL_UNDEF.
 VAL_TYPE beginReverse(Dictionary D) {
-	
+	return 1;
 }
 
 // currentKey()
 // If an iteration (forward or reverse) over D has started, returns the 
 // the current key. If no iteration is underway, returns KEY_UNDEF.
 KEY_TYPE currentKey(Dictionary D) {
-	
+	return "%";
 }
 
 // currentVal()
@@ -261,7 +236,7 @@ KEY_TYPE currentKey(Dictionary D) {
 // value corresponding to the current key. If no iteration is underway, 
 // returns VAL_UNDEF.
 VAL_TYPE currentVal(Dictionary D) {
-	
+	return 1;
 }
 
 // next()
@@ -272,7 +247,7 @@ VAL_TYPE currentVal(Dictionary D) {
 // ends the iteration and returns VAL_UNDEF. If no iteration is underway, 
 // returns VAL_UNDEF.
 VAL_TYPE next(Dictionary D) {
-	
+	return 1;
 }
 
 
@@ -284,7 +259,7 @@ VAL_TYPE next(Dictionary D) {
 // ends the iteration and returns VAL_UNDEF. If no iteration is underway, 
 // returns VAL_UNDEF. 
 VAL_TYPE prev(Dictionary D) {
-	
+	return 1;
 }
 
 
@@ -296,6 +271,6 @@ VAL_TYPE prev(Dictionary D) {
 // single space.  The pairs are printed in the order defined by the operator
 // KEY_CMP().
 void printDictionary(FILE* out, Dictionary D) {
-	
+	return;
 }
 

@@ -23,8 +23,11 @@
 
 //-----------------------------------------------------------------------------
 
-int main(){
+int main(){	
 	Dictionary D = newDictionary(1);
-	
+	insert(D,"A", 1);
+	insert(D, "BROSKI", 97);
+	insert(D, "B", 9);
+	freeDictionary(&D);
 	return(0);
 }

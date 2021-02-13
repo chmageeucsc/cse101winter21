@@ -28,8 +28,8 @@ typedef struct NodeObj {
 	KEY_TYPE key;
 	VAL_TYPE val;
 	struct NodeObj* parent;			// prev node
-	struct NodeObj* left;		// next node
-	struct NodeObj* right;	// next node
+	struct NodeObj* left;			// next node
+	struct NodeObj* right;			// next node
 } NodeObj;
 
 // private Node type
@@ -37,6 +37,7 @@ typedef NodeObj* Node;
 
 // private DictionaryObj type
 typedef struct DictionaryObj {
+	//KEY_TYPE key;
 	Node root;
 	Node NIL;
 	Node cursor;
@@ -71,14 +72,12 @@ void freeNode(Node* pN){
 // precondition: lookup(D, k)==VAL_UNDEF
 Dictionary newDictionary(int unique) {
 	Dictionary D = malloc(sizeof(DictionaryObj));
-	D->NIL = NULL;
+	//D->key = malloc(sizeof(KEY_TYPE));		// question mark ?????
+	D->NIL = newNode("%", -70);
 	D->NIL->parent = D->NIL;
 	D->NIL->left = D->NIL;
 	D->NIL->right = D->NIL;
-	D->NIL->key = "%";
-	D->NIL->val = -70;
 	D->root = NULL;
-	D->root->parent = D->NIL;
 	D->size = 0;
 	D->cursor = NULL;
 	D->unique = unique;
@@ -88,7 +87,10 @@ Dictionary newDictionary(int unique) {
 // freeDictionary()
 // Frees heap memory associated with *pD, sets *pD to NULL.
 void freeDictionary(Dictionary* pD) {
-	makeEmpty(* pD);
+	if(pD != NULL && *pD != NULL) {
+		makeEmpty(*pD);
+	}
+	free((*pD)->NIL);
 	free(*pD);
 	*pD = NULL;
 }
@@ -110,15 +112,17 @@ int getUnique(Dictionary D) {
 }
 
 // treeSearch()
-// helper function for finding the node of key k
+// helper function for lookup
 Node treeSearch(Dictionary D, Node x, KEY_TYPE k) {
-	if ((x == D->NIL) || (k == x->key)) {
-		return x;
+	while ((x != D->NIL) && (k != x->key)) {
+		if (k < x->key) {
+			x = x->left;
 		}
-	if (k < x->key) {
-		return (treeSearch(D, x->left, k));
+		else {
+			x = x->right;
+		}
 	}
-	else {return (treeSearch(D, x->right, k));}
+	return x;
 }
 
 // lookup()
@@ -127,48 +131,38 @@ Node treeSearch(Dictionary D, Node x, KEY_TYPE k) {
 // returns VAL_UNDEF.
 VAL_TYPE lookup(Dictionary D, KEY_TYPE k) {
 	Node x;
-	x = D->root;
-	if ((x == D->NIL) || (k == x->key)) {
-		if (KEY_CMP(x->key, k) == 0) {
-			return x->val;
-		}
-		else {
-			return VAL_UNDEF;
-		}
+	x = treeSearch(D, D->root, k);
+	if (KEY_CMP(x->key, k) == 0) {
+		return x->val;
 	}
-	if (k < x->key) {
-		return ((treeSearch(D, x->left, k))->val);
+	else {
+		return VAL_UNDEF;
 	}
-	else {return ((treeSearch(D, x->right, k))->val);}
 }
 
 // treeMinimum()
 // helper function
-KEY_TYPE treeMinimum(Dictionary D, KEY_TYPE k) {
-	Node x = D->root;
-	x = treeSearch(D, x, k);
+Node treeMinimum(Dictionary D, Node x) {
 	if (x != D->NIL) {
 		while (x->left != D->NIL) {
 			x = x->left;
 		}
-		return x->key;
+		return x;
 	}
-	return D->NIL->key;
+	return D->NIL;
 }
 
-// treeMaximum()
+/*// treeMaximum()
 // helper function
-KEY_TYPE treeMaximum(Dictionary D, KEY_TYPE k) {
-	Node x = D->root;
-	x = treeSearch(D, x, k);
+Node treeMaximum(Dictionary D, Node x) {
 	if (x != D->NIL) {
 		while (x->right != D->NIL) {
 			x = x->right;
 		}
-		return x->key;
+		return x;
 	}
-	return D->NIL->key;
-}
+	return D->NIL;
+}*/
 
 // Manipulation procedures ----------------------------------------------------
 
@@ -178,34 +172,111 @@ KEY_TYPE treeMaximum(Dictionary D, KEY_TYPE k) {
 // If getUnique(D) is true (1), then the precondition lookup(D, k)==VAL_UNDEF
 // is enforced. 
 void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
-	if (getUnique(D) == 1) {
-		
+	Node y, x, z;
+	z = newNode(k,v);
+	if (size(D) == 0) {
+		D->root = z;
+		D->root->parent = D->NIL;
+		D->root->left = D->NIL;
+		D->root->right = D->NIL;
 	}
+	else {
+		y = D->NIL;
+		x = D->root;
+		if (getUnique(D) == 1) {
+			if (lookup(D, k) != VAL_UNDEF) {
+				printf("Dictionary Error: calling insert() with invalid key, value pair\n");
+				exit(EXIT_FAILURE);
+			}
+		}
+		while (x != D->NIL) {
+			y = x;
+			if (z->key < x->key) {
+				x = x->left;
+			}
+			else {
+				x = x->right;
+			}
+		}
+		z->parent = y;
+		if (y == D->NIL) {
+			D->root = z;	// tree was empty
+		}
+		else if (z->key < y->key) {
+			y->left = z;
+		}
+		else {
+			y->right = z;
+		}
+		z->left = D->NIL;
+		z->right = D->NIL;
+	}
+	D->size++;
 }
 
 // transplant()
 // helper function for delete
-void transplant(Dictionary D, Node k, Node l) {
-	
+void transplant(Dictionary D, Node u, Node v) {
+	if (u->parent == D->NIL) {			// if parent is NIL, u is the root
+		D->root = v;
+	}
+	else if (u == u->parent->left) {
+		u->parent->left = v;
+	}
+	else {
+		u->parent->right = v;
+	}
+	if (v == D->NIL) {
+		v->parent = u->parent;
+	}
 }
 
 // delete()
 // Remove the pair whose key is k from Dictionary D.
 // Pre: lookup(D,k)!=VAL_UNDEF (i.e. D contains a pair whose key is k.)
 void delete(Dictionary D, KEY_TYPE k) {
-	
+	Node y, z;
+	z = treeSearch(D, D->root, k);
+	if (z->left == D->NIL) {						// case 1 or 2.1 (right only)
+		transplant(D, z, z->right);
+	}
+	else if (z->right == D->NIL) {					// case 2.2 (left only)
+		transplant(D, z, z->left);
+	}
+	else {											// case 3
+		y = treeMinimum(D, z->right);
+		if (y->parent != z) {
+			transplant(D, y, y->right);
+			y->right = z->right;
+			y->right->parent = y;
+		}
+		transplant(D, z, y);
+		y->left = z->left;
+		y->left->parent = y;
+	}
+	freeNode(&z);
+	D->size--;
 }
 
 // postOrderTreeWalk()
-// for deleting the nodes
-void postOrderTreeWalk(KEY_TYPE k) {
-	
+// helper function for makeEmpty
+void postOrderTreeWalk(Dictionary D, Node x) {
+	if (x != D->NIL) {
+		postOrderTreeWalk(D, x->left);
+		postOrderTreeWalk(D, x->right);
+		delete(D, x->key);
+	}
 }
 
 // makeEmpty()
 // Reset Dictionary D to the empty state, containing no pairs.
 void makeEmpty(Dictionary D) {
-	
+	if(D == NULL) {
+		printf("Dictionary Error: calling makeEmpty() on NULL Dictionary reference\n");
+		exit(EXIT_FAILURE);
+	}
+	Node x = D->root;
+	postOrderTreeWalk(D, x);
 }
 
 // beginForward()
@@ -213,6 +284,9 @@ void makeEmpty(Dictionary D) {
 // (as defined by the order operator KEY_CMP()), then returns the first
 // value. If D is empty, returns VAL_UNDEF. 
 VAL_TYPE beginForward(Dictionary D) {
+	if (D->size != 0) {
+		return 1;
+	}
 	return 1;
 }
 
@@ -221,6 +295,9 @@ VAL_TYPE beginForward(Dictionary D) {
 // (as defined by the order operator KEY_CMP()), then returns the last
 // value. If D is empty, returns VAL_UNDEF.
 VAL_TYPE beginReverse(Dictionary D) {
+	if (D->size != 0) {
+		return 1;
+	}
 	return 1;
 }
 

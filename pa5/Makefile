@@ -3,9 +3,11 @@
 #
 #  make                     makes Lex
 #  make DictionaryClient    makes DictionaryClient
+#  make DictionaryTest    	makes DictionaryTest
 #  make clean               removes all binaries
 #  make check1              checks DictionaryClient for memory leaks
 #  make check2              checks Lex for memory leaks on in4
+#  make check3              checks DictionaryTest for memory leaks
 #------------------------------------------------------------------------------
 
 TOP              = Lex
@@ -15,6 +17,9 @@ ADT              = Dictionary
 TEST             = $(ADT)Client
 TEST_OBJ         = $(TEST).o
 TEST_SRC         = $(TEST).c
+DTEST            = $(ADT)Test
+DTEST_OBJ        = $(DTEST).o
+DTEST_SRC        = $(DTEST).c
 ADT_OBJ          = $(ADT).o
 ADT_SRC          = $(ADT).c
 ADT_HDR          = $(ADT).h
@@ -34,12 +39,18 @@ $(TOP_OBJ) : $(TOP_SRC) $(ADT_HDR)
 
 $(TEST_OBJ) : $(TEST_SRC) $(ADT_HDR)
 	$(COMPILE) $(TEST_SRC)
+	
+$(DTEST) : $(DTEST_OBJ) $(ADT_OBJ)
+	$(LINK) $(DTEST) $(DTEST_OBJ) $(ADT_OBJ)
+
+$(DTEST_OBJ) : $(DTEST_SRC) $(ADT_HDR)
+	$(COMPILE) $(DTEST_SRC)
 
 $(ADT_OBJ) : $(ADT_SRC) $(ADT_HDR)
 	$(COMPILE) $(ADT_SRC)
 
 clean :
-	$(REMOVE) $(TOP) $(TOP_OBJ) $(TEST) $(TEST_OBJ) $(ADT_OBJ)
+	$(REMOVE) $(TOP) $(TOP_OBJ) $(TEST) $(TEST_OBJ) $(ADT_OBJ) $(DTEST) $(DTEST_OBJ)
 
 check1 : $(TEST)
 	$(MEMCHECK) $(TEST)
@@ -47,3 +58,6 @@ check1 : $(TEST)
 check2 : $(TOP)
 	$(MEMCHECK) $(TOP) in4 junk4
 
+check3 : $(DTEST)
+	$(MEMCHECK) $(DTEST)
+	

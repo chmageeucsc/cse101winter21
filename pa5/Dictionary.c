@@ -11,6 +11,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
+#include<stdbool.h>
 #include "Dictionary.h"
 
 #define KEY_TYPE char*
@@ -20,6 +21,11 @@
 #define KEY_FORMAT "%s"
 #define VAL_FORMAT "%d"
 #define KEY_CMP(x,y) strcmp((x),(y))
+
+// extras ---------------------------------------------------------------------
+
+bool forwardOn = false;		// check for forward iteration
+bool reverseOn = false;		// check for reverse iteration
 
 // structs --------------------------------------------------------------------
 
@@ -73,7 +79,7 @@ void freeNode(Node* pN){
 Dictionary newDictionary(int unique) {
 	Dictionary D = malloc(sizeof(DictionaryObj));
 	//D->key = malloc(sizeof(KEY_TYPE));		// question mark ?????
-	D->NIL = newNode("%", -70);
+	D->NIL = newNode("KEY_UNDEF", VAL_UNDEF);
 	D->NIL->parent = D->NIL;
 	D->NIL->left = D->NIL;
 	D->NIL->right = D->NIL;
@@ -115,7 +121,8 @@ int getUnique(Dictionary D) {
 // helper function for lookup
 Node treeSearch(Dictionary D, Node x, KEY_TYPE k) {
 	while ((x != D->NIL) && (k != x->key)) {
-		if (k < x->key) {
+		if (KEY_CMP(k, x->key) < 0) {
+		//if (k < x->key) {
 			x = x->left;
 		}
 		else {
@@ -152,7 +159,7 @@ Node treeMinimum(Dictionary D, Node x) {
 	return D->NIL;
 }
 
-/*// treeMaximum()
+// treeMaximum()
 // helper function
 Node treeMaximum(Dictionary D, Node x) {
 	if (x != D->NIL) {
@@ -162,7 +169,7 @@ Node treeMaximum(Dictionary D, Node x) {
 		return x;
 	}
 	return D->NIL;
-}*/
+}
 
 // Manipulation procedures ----------------------------------------------------
 
@@ -191,7 +198,8 @@ void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
 		}
 		while (x != D->NIL) {
 			y = x;
-			if (z->key < x->key) {
+			if (KEY_CMP(z->key, x->key) < 0) {
+			//if (z->key < x->key) {
 				x = x->left;
 			}
 			else {
@@ -202,7 +210,8 @@ void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
 		if (y == D->NIL) {
 			D->root = z;	// tree was empty
 		}
-		else if (z->key < y->key) {
+		else if (KEY_CMP(z->key, y->key) < 0) {
+		//else if (z->key < y->key) {
 			y->left = z;
 		}
 		else {
@@ -268,6 +277,16 @@ void postOrderTreeWalk(Dictionary D, Node x) {
 	}
 }
 
+// inOrderTreeWalk()
+// helper function for printDictionary
+void inOrderTreeWalk(Dictionary D, Node x) {
+	if (x != D->NIL) {
+		inOrderTreeWalk(D, x->left);
+		printf("%s %d\n", x->key, x->val);
+		inOrderTreeWalk(D, x->right);
+	}
+}
+
 // makeEmpty()
 // Reset Dictionary D to the empty state, containing no pairs.
 void makeEmpty(Dictionary D) {
@@ -285,9 +304,14 @@ void makeEmpty(Dictionary D) {
 // value. If D is empty, returns VAL_UNDEF. 
 VAL_TYPE beginForward(Dictionary D) {
 	if (D->size != 0) {
-		return 1;
+		forwardOn = true;
+		D->cursor = treeMinimum(D, D->root);
+		D->cursor->parent = treeMinimum(D, D->root)->parent;
+		D->cursor->left = treeMinimum(D, D->root)->left;
+		D->cursor->right = treeMinimum(D, D->root)->right;
+		return (treeMinimum(D, D->root)->val);
 	}
-	return 1;
+	return VAL_UNDEF;
 }
 
 // beginReverse()
@@ -296,16 +320,24 @@ VAL_TYPE beginForward(Dictionary D) {
 // value. If D is empty, returns VAL_UNDEF.
 VAL_TYPE beginReverse(Dictionary D) {
 	if (D->size != 0) {
-		return 1;
+		reverseOn = true;
+		D->cursor = treeMaximum(D, D->root);
+		D->cursor->parent = treeMaximum(D, D->root)->parent;
+		D->cursor->left = treeMaximum(D, D->root)->left;
+		D->cursor->right = treeMaximum(D, D->root)->right;
+		return (treeMaximum(D, D->root)->val);
 	}
-	return 1;
+	return VAL_UNDEF;
 }
 
 // currentKey()
 // If an iteration (forward or reverse) over D has started, returns the 
 // the current key. If no iteration is underway, returns KEY_UNDEF.
 KEY_TYPE currentKey(Dictionary D) {
-	return "%";
+	if ((forwardOn == true) || (reverseOn == true)) {
+		return D->cursor->key;
+	}
+	return KEY_UNDEF;
 }
 
 // currentVal()
@@ -313,7 +345,10 @@ KEY_TYPE currentKey(Dictionary D) {
 // value corresponding to the current key. If no iteration is underway, 
 // returns VAL_UNDEF.
 VAL_TYPE currentVal(Dictionary D) {
-	return 1;
+	if ((forwardOn == true) || (reverseOn == true)) {
+		return D->cursor->val;
+	}
+	return VAL_UNDEF;
 }
 
 // next()
@@ -324,7 +359,29 @@ VAL_TYPE currentVal(Dictionary D) {
 // ends the iteration and returns VAL_UNDEF. If no iteration is underway, 
 // returns VAL_UNDEF.
 VAL_TYPE next(Dictionary D) {
-	return 1;
+	if (forwardOn == true) {
+		if (KEY_CMP(D->cursor->key, D->cursor->right->key) = < 0) {
+			D->cursor = D->cursor->right;
+			return (D->cursor->val);
+		}
+		else {
+			D->cursor = D->cursor->parent;
+			return (D->cursor->val);
+		}
+	}
+	else if (reverseOn == true) {
+		if (D->cursor->left != D->NIL) {
+			while (D->cursor->left != D->NIL) {
+				D->cursor = D->cursor->left;
+			}
+			return (D->cursor->val);
+		}
+		else {
+			D->cursor = D->cursor->parent;
+			return (D->cursor->val);
+		}
+	}
+	return VAL_UNDEF;
 }
 
 
@@ -336,7 +393,29 @@ VAL_TYPE next(Dictionary D) {
 // ends the iteration and returns VAL_UNDEF. If no iteration is underway, 
 // returns VAL_UNDEF. 
 VAL_TYPE prev(Dictionary D) {
-	return 1;
+	if (forwardOn == true) {
+		if (D->cursor->left != D->NIL) {
+			while (D->cursor->left != D->NIL) {
+				D->cursor = D->cursor->left;
+			}
+			return (D->cursor->val);
+		}
+		else {
+			D->cursor = D->cursor->parent;
+			return (D->cursor->val);
+		}
+	}
+	else if (reverseOn == true) {
+		if (D->cursor->right != D->NIL) {
+			D->cursor = D->cursor->right;
+			return (D->cursor->val);
+		}
+		else {
+			D->cursor = D->cursor->parent;
+			return (D->cursor->val);
+		}
+	}
+	return VAL_UNDEF;
 }
 
 
@@ -348,6 +427,6 @@ VAL_TYPE prev(Dictionary D) {
 // single space.  The pairs are printed in the order defined by the operator
 // KEY_CMP().
 void printDictionary(FILE* out, Dictionary D) {
-	return;
+	inOrderTreeWalk(D, D->root);
 }
 

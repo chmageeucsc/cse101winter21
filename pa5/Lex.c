@@ -25,9 +25,32 @@
 
 int main(){	
 	Dictionary D = newDictionary(1);
-	insert(D,"A", 1);
-	insert(D, "BROSKI", 97);
-	insert(D, "B", 9);
+	insert(D, "a", 9);
+	insert(D, "b", 12);
+	insert(D, "c", 5);
+	insert(D, "d", 7);
+	insert(D, "e", 10);
+	insert(D, "f", 15);
+	insert(D, "g", 23);
+	insert(D, "h", 13);
+	insert(D, "i", 4);
+	insert(D, "j", 24);
+	insert(D, "k", 3);
+	insert(D, "l", 6);
+	insert(D, "m", 17);
+	insert(D, "n", 0);
+	insert(D, "o", 20);
+	insert(D, "p", 22);
+	insert(D, "q", 25);
+	insert(D, "r", 19);
+	insert(D, "s", 16);
+	insert(D, "t", 8);
+	insert(D, "u", 21);
+	insert(D, "v", 14);
+	insert(D, "w", 2);
+	insert(D, "x", 18);
+	insert(D, "y", 11);
+	insert(D, "z", 1);
 	freeDictionary(&D);
 	return(0);
 }

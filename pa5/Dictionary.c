@@ -235,7 +235,7 @@ void transplant(Dictionary D, Node u, Node v) {
 	else {
 		u->parent->right = v;
 	}
-	if (v == D->NIL) {
+	if (v != D->NIL) {
 		v->parent = u->parent;
 	}
 }
@@ -244,27 +244,29 @@ void transplant(Dictionary D, Node u, Node v) {
 // Remove the pair whose key is k from Dictionary D.
 // Pre: lookup(D,k)!=VAL_UNDEF (i.e. D contains a pair whose key is k.)
 void delete(Dictionary D, KEY_TYPE k) {
-	Node y, z;
-	z = treeSearch(D, D->root, k);
-	if (z->left == D->NIL) {						// case 1 or 2.1 (right only)
-		transplant(D, z, z->right);
-	}
-	else if (z->right == D->NIL) {					// case 2.2 (left only)
-		transplant(D, z, z->left);
-	}
-	else {											// case 3
-		y = treeMinimum(D, z->right);
-		if (y->parent != z) {
-			transplant(D, y, y->right);
-			y->right = z->right;
-			y->right->parent = y;
+	if (lookup(D, k) != VAL_UNDEF) {
+		Node y, z;
+		z = treeSearch(D, D->root, k);
+		if (z->left == D->NIL) {						// case 1 or 2.1 (right only)
+			transplant(D, z, z->right);
 		}
-		transplant(D, z, y);
-		y->left = z->left;
-		y->left->parent = y;
+		else if (z->right == D->NIL) {					// case 2.2 (left only)
+			transplant(D, z, z->left);
+		}
+		else {											// case 3
+			y = treeMinimum(D, z->right);
+			if (y->parent != z) {
+				transplant(D, y, y->right);
+				y->right = z->right;
+				y->right->parent = y;
+			}
+			transplant(D, z, y);
+			y->left = z->left;
+			y->left->parent = y;
+		}
+		freeNode(&z);
+		D->size--;
 	}
-	freeNode(&z);
-	D->size--;
 }
 
 // postOrderTreeWalk()
@@ -273,7 +275,7 @@ void postOrderTreeWalk(Dictionary D, Node x) {
 	if (x != D->NIL) {
 		postOrderTreeWalk(D, x->left);
 		postOrderTreeWalk(D, x->right);
-		delete(D, x->key);
+		freeNode(&x);
 	}
 }
 
@@ -351,6 +353,35 @@ VAL_TYPE currentVal(Dictionary D) {
 	return VAL_UNDEF;
 }
 
+// treeSuccessor()
+// helper function for next() and prev()
+Node treeSuccessor(Dictionary D, Node x) {
+	Node y;
+	if (x->right != D->NIL) {
+		return treeMinimum(D, x->right);
+	}
+	y = x->parent;
+	while ((y != D->NIL) && (x == y->right)) {
+		x = y;
+		y = y->parent;
+	}
+	return y;
+}
+
+// treePredecessor()
+// helper function for next() and prev()
+Node treePredecessor(Dictionary D, Node x) {
+	Node y;
+	if (x->left != D->NIL) {
+		return treeMaximum(D, x->left);
+	}
+	y = x->parent;
+	while ((y != D->NIL) && (KEY_CMP(x->key, y->key) < 0)) {
+		y = y->parent;
+	}
+	return y;
+}
+
 // next()
 // If an iteration (forward or reverse) over D has started, and has not
 // reached the last pair, moves to the next key in D (as defined by the 
@@ -360,26 +391,18 @@ VAL_TYPE currentVal(Dictionary D) {
 // returns VAL_UNDEF.
 VAL_TYPE next(Dictionary D) {
 	if (forwardOn == true) {
-		if (KEY_CMP(D->cursor->key, D->cursor->right->key) = < 0) {
-			D->cursor = D->cursor->right;
-			return (D->cursor->val);
+		D->cursor = treeSuccessor(D, D->cursor);
+		if (D->cursor == treeMaximum(D, D->root)) {
+			return VAL_UNDEF;
 		}
-		else {
-			D->cursor = D->cursor->parent;
-			return (D->cursor->val);
-		}
+		return (D->cursor->val);
 	}
 	else if (reverseOn == true) {
-		if (D->cursor->left != D->NIL) {
-			while (D->cursor->left != D->NIL) {
-				D->cursor = D->cursor->left;
-			}
-			return (D->cursor->val);
+		D->cursor = treePredecessor(D, D->cursor);
+		if (D->cursor == D->root) {
+			return VAL_UNDEF;
 		}
-		else {
-			D->cursor = D->cursor->parent;
-			return (D->cursor->val);
-		}
+		return (D->cursor->val);
 	}
 	return VAL_UNDEF;
 }
@@ -394,26 +417,18 @@ VAL_TYPE next(Dictionary D) {
 // returns VAL_UNDEF. 
 VAL_TYPE prev(Dictionary D) {
 	if (forwardOn == true) {
-		if (D->cursor->left != D->NIL) {
-			while (D->cursor->left != D->NIL) {
-				D->cursor = D->cursor->left;
-			}
-			return (D->cursor->val);
+		D->cursor = treePredecessor(D, D->cursor);
+		if (D->cursor == D->root) {
+			return VAL_UNDEF;
 		}
-		else {
-			D->cursor = D->cursor->parent;
-			return (D->cursor->val);
-		}
+		return (D->cursor->val);
 	}
 	else if (reverseOn == true) {
-		if (D->cursor->right != D->NIL) {
-			D->cursor = D->cursor->right;
-			return (D->cursor->val);
+		D->cursor = treeSuccessor(D, D->cursor);
+		if (D->cursor == treeMaximum(D, D->root)) {
+			return VAL_UNDEF;
 		}
-		else {
-			D->cursor = D->cursor->parent;
-			return (D->cursor->val);
-		}
+		return (D->cursor->val);
 	}
 	return VAL_UNDEF;
 }

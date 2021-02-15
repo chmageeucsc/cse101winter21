@@ -24,8 +24,7 @@
 //-----------------------------------------------------------------------------
 
 int main(){	
-	Dictionary D = newDictionary(1);
-	insert(D, "a", 9);
+	/*insert(D, "a", 9);
 	insert(D, "b", 12);
 	insert(D, "c", 5);
 	insert(D, "d", 7);
@@ -50,7 +49,43 @@ int main(){
 	insert(D, "w", 2);
 	insert(D, "x", 18);
 	insert(D, "y", 11);
-	insert(D, "z", 1);
-	freeDictionary(&D);
+	insert(D, "z", 1);*/
+	
+	int i, n=26;
+   Dictionary A = newDictionary(0);
+   Dictionary B = newDictionary(1);
+   char* word[] = { "n","z","w","k","i","c","l","d","t","a", 
+                    "e","y","b","h","v","f","s","m","x","r",
+                    "o","u","p","g","j","q" };
+   VAL_TYPE x;
+   VAL_TYPE y;
+
+   // add pairs to A --------------------------------------
+   for(i=0; i<n; i++){
+      insert(A, word[i], i);
+   }
+
+   // add pairs to B
+   for(i=n-1; i>=0; i--){
+      insert(B, word[i], i);
+   }
+
+
+   // forward iteration over A ----------------------------
+   printf("forward A:\n");
+   for(x=beginForward(A); currentVal(A)!=VAL_UNDEF; x=next(A)){
+      printf("key: "KEY_FORMAT" value: "VAL_FORMAT"\n", currentKey(A), x);
+   }
+   printf("\n\n");
+
+   // reverse iteratation over B 
+   printf("reverse B:\n");
+   for(y=beginReverse(B); currentVal(B)!=VAL_UNDEF; y=prev(B)){
+      printf("key: "KEY_FORMAT" value: "VAL_FORMAT"\n", currentKey(B), y);
+   }
+   printf("\n\n");
+   
+   freeDictionary(&A);
+   freeDictionary(&B);
 	return(0);
 }

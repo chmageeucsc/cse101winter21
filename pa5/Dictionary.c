@@ -259,6 +259,7 @@ void delete(Dictionary D, KEY_TYPE k) {
 			y->left = z->left;
 			y->left->parent = y;
 		}
+		D->cursor = D->NIL;
 		freeNode(&z);
 		D->size--;
 	}
@@ -267,10 +268,15 @@ void delete(Dictionary D, KEY_TYPE k) {
 // postOrderTreeWalk()
 // helper function for makeEmpty
 void postOrderTreeWalk(Dictionary D, Node x) {
+	if(D == NULL) {
+		printf("Dictionary Error: calling postOrderTreeWalk() on NULL Dictionary reference\n");
+		exit(EXIT_FAILURE);
+	}
 	if (x != D->NIL) {
 		postOrderTreeWalk(D, x->left);
 		postOrderTreeWalk(D, x->right);
 		freeNode(&x);
+		//delete(D, x->key);
 	}
 }
 
@@ -291,8 +297,10 @@ void makeEmpty(Dictionary D) {
 		printf("Dictionary Error: calling makeEmpty() on NULL Dictionary reference\n");
 		exit(EXIT_FAILURE);
 	}
-	Node x = D->root;
-	postOrderTreeWalk(D, x);
+	if (D->size > 0) {
+		Node x = D->root;
+		postOrderTreeWalk(D, x);
+	}
 }
 
 // beginForward()

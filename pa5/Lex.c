@@ -48,21 +48,25 @@ int main(int argc, char * argv[]){
 		printf("Unable to open file %s for writing\n", argv[2]);
 		exit(1);
 	}
-
-	// read each line of input file, then count and print tokens
+	
 	line_count = 0;
+	//char array [line_count][MAX_LEN];		// old method used from pa1 (less efficient)
+	char *array [200000];
+	
+	// read each line of input file
 	while( fgets(line, MAX_LEN, in) != NULL)  {
+		array[line_count] = calloc(strlen(line) + 1, sizeof(char*));
+		strcpy(array[line_count], line);
 		line_count++;
 	}
 	
-	//fprintf(out, "the total number of lines is %d\n", line_count);
-	char array [line_count][MAX_LEN];
+	/*array = (char**)malloc(line_count*sizeof(char*)); 
 	int x = 0;
 	rewind(in);		// resets fgets to the top of the file
 	while( fgets(line, MAX_LEN, in) != NULL)  {	// populates array with lines from input file
 		strcpy(array[x], line);
 		x++;
-	}
+	}*/
 	Dictionary D = newDictionary(0);
 	for (int i = 0; i < line_count; i++) {
 		insert(D, array[i], i);
@@ -75,8 +79,12 @@ int main(int argc, char * argv[]){
 	for(; currentVal(D)!=VAL_UNDEF; next(D)){
 	  fprintf(out, KEY_FORMAT, currentKey(D));
 	}
-	
 	freeDictionary(&D);
+	
+	for (int i = 0; i < line_count; i++) {
+		free(array[i]);
+	}
+	//free(array);
 
 	// close files 
 	fclose(in);

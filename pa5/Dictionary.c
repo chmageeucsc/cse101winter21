@@ -43,7 +43,6 @@ typedef NodeObj* Node;
 
 // private DictionaryObj type
 typedef struct DictionaryObj {
-	//KEY_TYPE key;
 	Node root;
 	Node NIL;
 	Node cursor;
@@ -78,7 +77,6 @@ void freeNode(Node* pN){
 // precondition: lookup(D, k)==VAL_UNDEF
 Dictionary newDictionary(int unique) {
 	Dictionary D = malloc(sizeof(DictionaryObj));
-	//D->key = malloc(sizeof(KEY_TYPE));		// question mark ?????
 	D->NIL = newNode("KEY_UNDEF", VAL_UNDEF);
 	D->NIL->parent = D->NIL;
 	D->NIL->left = D->NIL;
@@ -122,7 +120,6 @@ int getUnique(Dictionary D) {
 Node treeSearch(Dictionary D, Node x, KEY_TYPE k) {
 	while ((x != D->NIL) && (k != x->key)) {
 		if (KEY_CMP(k, x->key) < 0) {
-		//if (k < x->key) {
 			x = x->left;
 		}
 		else {
@@ -199,7 +196,6 @@ void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
 		while (x != D->NIL) {
 			y = x;
 			if (KEY_CMP(z->key, x->key) < 0) {
-			//if (z->key < x->key) {
 				x = x->left;
 			}
 			else {
@@ -211,7 +207,6 @@ void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
 			D->root = z;	// tree was empty
 		}
 		else if (KEY_CMP(z->key, y->key) < 0) {
-		//else if (z->key < y->key) {
 			y->left = z;
 		}
 		else {
@@ -392,14 +387,16 @@ Node treePredecessor(Dictionary D, Node x) {
 VAL_TYPE next(Dictionary D) {
 	if (forwardOn == true) {
 		D->cursor = treeSuccessor(D, D->cursor);
-		if (D->cursor == treeMaximum(D, D->root)) {
+		//if (D->cursor == treeMaximum(D, D->root)) {
+		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
 		return (D->cursor->val);
 	}
 	else if (reverseOn == true) {
 		D->cursor = treePredecessor(D, D->cursor);
-		if (D->cursor == D->root) {
+		//if (D->cursor == D->root) {
+		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
 		return (D->cursor->val);
@@ -418,14 +415,16 @@ VAL_TYPE next(Dictionary D) {
 VAL_TYPE prev(Dictionary D) {
 	if (forwardOn == true) {
 		D->cursor = treePredecessor(D, D->cursor);
-		if (D->cursor == D->root) {
+		//if (D->cursor == D->root) {
+		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
 		return (D->cursor->val);
 	}
 	else if (reverseOn == true) {
 		D->cursor = treeSuccessor(D, D->cursor);
-		if (D->cursor == treeMaximum(D, D->root)) {
+		//if (D->cursor == treeMaximum(D, D->root)) {
+		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
 		return (D->cursor->val);

@@ -77,11 +77,11 @@ void freeNode(Node* pN){
 // precondition: lookup(D, k)==VAL_UNDEF
 Dictionary newDictionary(int unique) {
 	Dictionary D = malloc(sizeof(DictionaryObj));
-	D->NIL = newNode("KEY_UNDEF", VAL_UNDEF);
+	D->NIL = newNode(KEY_UNDEF, VAL_UNDEF);
 	D->NIL->parent = D->NIL;
 	D->NIL->left = D->NIL;
 	D->NIL->right = D->NIL;
-	D->root = NULL;
+	D->root = D->NIL;
 	D->size = 0;
 	D->cursor = NULL;
 	D->unique = unique;
@@ -178,43 +178,32 @@ Node treeMaximum(Dictionary D, Node x) {
 void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
 	Node y, x, z;
 	z = newNode(k,v);
-	if (size(D) == 0) {
-		D->root = z;
-		D->root->parent = D->NIL;
-		D->root->left = D->NIL;
-		D->root->right = D->NIL;
-	}
-	else {
-		y = D->NIL;
-		x = D->root;
-		if (getUnique(D) == 1) {
-			if (lookup(D, k) != VAL_UNDEF) {
-				printf("Dictionary Error: calling insert() with invalid key, value pair\n");
-				exit(EXIT_FAILURE);
-			}
-		}
-		while (x != D->NIL) {
-			y = x;
+	y = D->NIL;
+	x = D->root; 
+	while (x != D->NIL) {
+		y = x;
+		if (x->key != NULL) {
 			if (KEY_CMP(z->key, x->key) < 0) {
 				x = x->left;
 			}
 			else {
 				x = x->right;
 			}
-		}
-		z->parent = y;
-		if (y == D->NIL) {
-			D->root = z;	// tree was empty
-		}
-		else if (KEY_CMP(z->key, y->key) < 0) {
-			y->left = z;
-		}
-		else {
-			y->right = z;
-		}
-		z->left = D->NIL;
-		z->right = D->NIL;
+		}	
 	}
+	z->parent = y;
+	if (y == D->NIL) {
+		D->root = z;
+	}
+	else if (KEY_CMP(z->key, y->key) < 0) {
+		y->left = z;
+	}
+	else {
+		y->right = z;
+	}
+	
+	z->left = D->NIL;
+	z->right = D->NIL;
 	D->size++;
 }
 
@@ -259,8 +248,11 @@ void delete(Dictionary D, KEY_TYPE k) {
 			y->left = z->left;
 			y->left->parent = y;
 		}
-		D->cursor = D->NIL;
+		
 		freeNode(&z);
+		if ((forwardOn == true) || (reverseOn == true)) {
+			D->cursor = D->NIL;
+		}
 		D->size--;
 	}
 }
@@ -276,6 +268,7 @@ void postOrderTreeWalk(Dictionary D, Node x) {
 		postOrderTreeWalk(D, x->left);
 		postOrderTreeWalk(D, x->right);
 		freeNode(&x);
+		D->size--;
 		//delete(D, x->key);
 	}
 }
@@ -300,6 +293,7 @@ void makeEmpty(Dictionary D) {
 	if (D->size > 0) {
 		Node x = D->root;
 		postOrderTreeWalk(D, x);
+		D->cursor = D->NIL;
 	}
 }
 

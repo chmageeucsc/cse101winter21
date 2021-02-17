@@ -134,8 +134,14 @@ Node treeSearch(Dictionary D, Node x, KEY_TYPE k) {
 // KEY_CMP(key, k)==0), then returns value. If D contains no such pair, then
 // returns VAL_UNDEF.
 VAL_TYPE lookup(Dictionary D, KEY_TYPE k) {
+	if (D->root == D->NIL) {
+		return VAL_UNDEF;
+	}
 	Node x;
 	x = treeSearch(D, D->root, k);
+	if (x->key == NULL) {
+		return VAL_UNDEF;
+	}
 	if (KEY_CMP(x->key, k) == 0) {
 		return x->val;
 	}
@@ -270,9 +276,9 @@ void postOrderTreeWalk(Dictionary D, Node x) {
 	if (x != D->NIL) {
 		postOrderTreeWalk(D, x->left);
 		postOrderTreeWalk(D, x->right);
+		//delete(D, x->key);
 		freeNode(&x);
 		D->size--;
-		//delete(D, x->key);
 	}
 }
 
@@ -297,6 +303,8 @@ void makeEmpty(Dictionary D) {
 		Node x = D->root;
 		postOrderTreeWalk(D, x);
 		D->cursor = D->NIL;
+		D->cursor->key = KEY_UNDEF;
+		D->cursor->val = VAL_UNDEF;
 	}
 }
 
@@ -392,7 +400,6 @@ Node treePredecessor(Dictionary D, Node x) {
 VAL_TYPE next(Dictionary D) {
 	if (forwardOn == true) {
 		D->cursor = treeSuccessor(D, D->cursor);
-		//if (D->cursor == treeMaximum(D, D->root)) {
 		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
@@ -400,7 +407,6 @@ VAL_TYPE next(Dictionary D) {
 	}
 	else if (reverseOn == true) {
 		D->cursor = treePredecessor(D, D->cursor);
-		//if (D->cursor == D->root) {
 		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
@@ -420,7 +426,6 @@ VAL_TYPE next(Dictionary D) {
 VAL_TYPE prev(Dictionary D) {
 	if (forwardOn == true) {
 		D->cursor = treePredecessor(D, D->cursor);
-		//if (D->cursor == D->root) {
 		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
@@ -428,7 +433,6 @@ VAL_TYPE prev(Dictionary D) {
 	}
 	else if (reverseOn == true) {
 		D->cursor = treeSuccessor(D, D->cursor);
-		//if (D->cursor == treeMaximum(D, D->root)) {
 		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
@@ -446,6 +450,8 @@ VAL_TYPE prev(Dictionary D) {
 // single space.  The pairs are printed in the order defined by the operator
 // KEY_CMP().
 void printDictionary(FILE* out, Dictionary D) {
-	inOrderTreeWalk(D, D->root);
+	if (D->size != 0) {
+		inOrderTreeWalk(D, D->root);
+	}
 }
 

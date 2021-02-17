@@ -248,11 +248,14 @@ void delete(Dictionary D, KEY_TYPE k) {
 			y->left = z->left;
 			y->left->parent = y;
 		}
+		if ((forwardOn == true) || (reverseOn == true)) {
+			if (D->cursor == z) {
+				D->cursor = D->NIL;
+			}
+		}
 		
 		freeNode(&z);
-		if ((forwardOn == true) || (reverseOn == true)) {
-			D->cursor = D->NIL;
-		}
+		
 		D->size--;
 	}
 }

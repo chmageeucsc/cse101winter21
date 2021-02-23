@@ -19,8 +19,8 @@
 #define KEY_FORMAT "%s"
 #define VAL_FORMAT "%p"
 #define KEY_CMP(x,y) strcmp(x,y)
-#define RED 123456789
-#define BLACK 987654321
+#define RED 0
+#define BLACK 1
 
 
 // structs --------------------------------------------------------------------
@@ -79,7 +79,9 @@ Dictionary newDictionary(int unique) {
 	D->NIL->parent = D->NIL;
 	D->NIL->left = D->NIL;
 	D->NIL->right = D->NIL;
+	D->NIL->color = BLACK;
 	D->root = D->NIL;
+	D->root->color = BLACK;
 	D->size = 0;
 	D->cursor = NULL;
 	D->unique = unique;
@@ -169,20 +171,235 @@ Node treeMaximum(Dictionary D, Node x) {
 
 // Manipulation procedures ----------------------------------------------------
 
+void leftRotate(Dictionary D, Node x) {
+	Node y;
+	y= x->right;
+	x->right = y->left;
+	if (y->left != D->NIL) {
+		y->left->parent = x;
+	}
+	y->parent = x->parent;
+	if (x->parent = D->NIL) {
+		D->root = y;
+	}
+	else if (x == x->parent->left) {
+		x->parent->left = y;
+	}
+	else {x->parent->right = y;}
+	y->left = x;
+	x->parent = y;
+}
+
+void rightRotate(Dictionary D, Node x) {
+	Node y;
+	y= x->left;
+	x->left = y->right;
+	if (y->right != D->NIL) {
+		y->right->parent = x;
+	}
+	y->parent = x->parent;
+	if (x->parent = D->NIL) {
+		D->root = y;
+	}
+	else if (x == x->parent->right) {
+		x->parent->right = y;
+	}
+	else {x->parent->left = y;}
+	y->right = x;
+	x->parent = y;
+}
+
 // insert()
 // Insert the pair (k,v) into Dictionary D. 
 // If getUnique(D) is false (0), then there are no preconditions.
 // If getUnique(D) is true (1), then the precondition lookup(D, k)==VAL_UNDEF
 // is enforced. 
 void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
-	
+	Node x, y, z;
+	y = D->NIL;
+	x = D->root;
+	z = newNode(k, v);
+	while (x != D->NIL) {
+		y = x;
+		if (KEY_CMP(z->key, x->key) < 0) {
+			x = x->left;
+		}
+		else { x = x->right;}
+	}
+	z->parent = y;
+	if (y == D->NIL) {
+		D->root = z;
+	}
+	else if (KEY_CMP(z->key, y->key) < 0) {
+		y->left = z; 
+	}
+	else { y->right = z;}
+	z->left = D->NIL;
+	z->right = D->NIL;
+	z->color = RED;
+	RB_InsertFixUp(D, z);
+}
+
+// RB_InsertFixUp()
+// helper function for insert()
+void RB_InsertFixUp(Dictionary D, Node z) {
+	while (z->parent->color == RED) {
+		if (z->parent == z->parent->parent->left) {
+			y = z->parent->parent->right;
+			if (y->color == RED) {
+				z->parent->color = BLACK;
+				y->color = BLACK;
+				z->parent->parent->color = RED;
+				z = z->parent->parent;
+			}
+			else {
+				if (z == z->parent->right) {
+					z = z->parent;
+					leftRotate(D, z);
+				}
+				z->parent->color = BLACK;
+				z->parent->parent->color = RED;
+				rightRotate(D, z->parent->parent);
+			}
+		}
+		else {
+			y = z->parent->parent->left;
+			if (y->color == RED) {
+				z->parent->color = BLACK;
+				y->color = BLACK;
+				z->parent->parent->color = RED;
+				z = z->parent->parent;
+			}
+			else {
+				if (z == z->parent->left) {
+					z = z->parent;
+					rightRotate(D, z);
+				}
+				z->parent->color = BLACK;
+				z->parent->parent->color = RED;
+				leftRotate(D, z->parent->parent);
+			}
+		}
+	}
+	D->root->color = BLACK;
+}
+
+// transplant()
+// helper function for delete
+void transplant(Dictionary D, Node u, Node v) {
+	if (u->parent == D->NIL) {			// if parent is NIL, u is the root
+		D->root = v;
+	}
+	else if (u == u->parent->left) {
+		u->parent->left = v;
+	}
+	else {
+		u->parent->right = v;
+	}
+	if (v != D->NIL) {
+		v->parent = u->parent;
+	}
 }
 
 // delete()
 // Remove the pair whose key is k from Dictionary D.
 // Pre: lookup(D,k)!=VAL_UNDEF (i.e. D contains a pair whose key is k.)
 void delete(Dictionary D, KEY_TYPE k) {
-	
+	Node x, y, z;
+	int y_origin_color;
+	z = treeSearch(D, D->root, k);
+	y = z;
+	y_origin_color = y->color;
+	if (z->left == D->NIL) {
+		x = z->right;
+		transplant(D, z, z->right);
+	}
+	else if (z->right == D->NIL) {
+		x = z->left;
+		transplant(D, z, z->left);
+	}
+	else {
+		treeMinimum(D, z->right);
+		y_origin_color = y->color;
+		x = y->right;
+		if (y->parent == z) {
+			x->parent = y;
+		}
+		else {
+			transplant(D, y, y->right);
+			y->right = z->right;
+			y->right->parent = y;
+		}
+		transplant(D, z, y);
+		y->left = z->left;
+		y->left->parent = y;
+		y->color = z->color;
+	}
+	if (y_origin_color == BLACK) {
+		RB_DeleteFixUp(D, x);
+	}
+	freeNode(&z);
+	D->size--;
+}
+
+// RB_DeleteFixUp()
+void RB_DeleteFixUp(Dictionary D, Node x) {
+	Node w;
+	while ((x != D->root) && (x->color == BLACK)) {
+		if (x == x->parent->left) {
+			w = x->parent->right;
+			if (w->color == RED) {
+				W->color = BLACK;
+				x->parent->color = RED;
+				leftRotate(D, x->parent);
+				w = x->parent->right;
+			}
+			if ((w->left->color == BLACK) && (w->right->color == BLACK)) {
+				w->color = RED;
+				x = x->parent;
+			}
+			else {
+				if (w->right->color == BLACK) {
+					w->left->color = BLACK;
+					w->color = RED;
+					rightRotate(D, w);
+					w = x->parent->right;
+				}
+				w->color = x->parent->color = BLACK;
+				x->parent->color = BLACK;
+				w->right->color = BLACK;
+				leftRotate(D, x->parent);
+				x = D->root;
+			}
+		}
+		else {
+			w = x->parent->left;
+			if (w->color == RED) {
+				w->color = BLACK;
+				x->parent->color = RED;
+				rightRotate(D, x->parent);
+				w = x->parent->left;
+			}
+			if ((w->right->color == BLACK) && (w->left->color == BLACK)) {
+				w->color = RED;
+				x = x->parent;
+			}
+			else {
+				if (w->left->color == BLACK) {
+					w->right->color = BLACK;
+					w->color = RED;
+					leftRotate(D, w);
+					w = x->parent->left;
+				}
+				w->color = x->parent->color;
+				x->parent->color = BLACK;
+				w->left->color = BLACK;
+				rightRotate(D, x->parent);
+				x = D->root;
+			}
+		}
+	}
+	x->color = BLACK;
 }
 
 // postOrderTreeWalk()

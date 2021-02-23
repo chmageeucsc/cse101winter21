@@ -11,6 +11,8 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
+#include<stdbool.h>
+#include "Dictionary.h"
 
 #define KEY_TYPE char*
 #define VAL_TYPE int*
@@ -22,6 +24,10 @@
 #define RED 0
 #define BLACK 1
 
+// extras ---------------------------------------------------------------------
+
+bool forwardOn = false;		// check for forward iteration
+bool reverseOn = false;		// check for reverse iteration
 
 // structs --------------------------------------------------------------------
 
@@ -91,7 +97,12 @@ Dictionary newDictionary(int unique) {
 // freeDictionary()
 // Frees heap memory associated with *pD, sets *pD to NULL.
 void freeDictionary(Dictionary* pD) {
-	
+	if(pD != NULL && *pD != NULL) {
+		makeEmpty(*pD);
+	}
+	free((*pD)->NIL);
+	free(*pD);
+	*pD = NULL;
 }
 
 
@@ -179,7 +190,7 @@ void leftRotate(Dictionary D, Node x) {
 		y->left->parent = x;
 	}
 	y->parent = x->parent;
-	if (x->parent = D->NIL) {
+	if (x->parent == D->NIL) {
 		D->root = y;
 	}
 	else if (x == x->parent->left) {
@@ -198,7 +209,7 @@ void rightRotate(Dictionary D, Node x) {
 		y->right->parent = x;
 	}
 	y->parent = x->parent;
-	if (x->parent = D->NIL) {
+	if (x->parent == D->NIL) {
 		D->root = y;
 	}
 	else if (x == x->parent->right) {
@@ -209,40 +220,10 @@ void rightRotate(Dictionary D, Node x) {
 	x->parent = y;
 }
 
-// insert()
-// Insert the pair (k,v) into Dictionary D. 
-// If getUnique(D) is false (0), then there are no preconditions.
-// If getUnique(D) is true (1), then the precondition lookup(D, k)==VAL_UNDEF
-// is enforced. 
-void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
-	Node x, y, z;
-	y = D->NIL;
-	x = D->root;
-	z = newNode(k, v);
-	while (x != D->NIL) {
-		y = x;
-		if (KEY_CMP(z->key, x->key) < 0) {
-			x = x->left;
-		}
-		else { x = x->right;}
-	}
-	z->parent = y;
-	if (y == D->NIL) {
-		D->root = z;
-	}
-	else if (KEY_CMP(z->key, y->key) < 0) {
-		y->left = z; 
-	}
-	else { y->right = z;}
-	z->left = D->NIL;
-	z->right = D->NIL;
-	z->color = RED;
-	RB_InsertFixUp(D, z);
-}
-
 // RB_InsertFixUp()
 // helper function for insert()
 void RB_InsertFixUp(Dictionary D, Node z) {
+	Node y;
 	while (z->parent->color == RED) {
 		if (z->parent == z->parent->parent->left) {
 			y = z->parent->parent->right;
@@ -284,6 +265,43 @@ void RB_InsertFixUp(Dictionary D, Node z) {
 	D->root->color = BLACK;
 }
 
+// insert()
+// Insert the pair (k,v) into Dictionary D. 
+// If getUnique(D) is false (0), then there are no preconditions.
+// If getUnique(D) is true (1), then the precondition lookup(D, k)==VAL_UNDEF
+// is enforced. 
+void insert(Dictionary D, KEY_TYPE k, VAL_TYPE v) {
+	if (getUnique(D) == 1) {
+		if (lookup(D, k) != VAL_UNDEF) {
+			return;
+		}
+	}
+	Node x, y, z;
+	y = D->NIL;
+	x = D->root;
+	z = newNode(k, v);
+	while (x != D->NIL) {
+		y = x;
+		if (KEY_CMP(z->key, x->key) < 0) {
+			x = x->left;
+		}
+		else { x = x->right;}
+	}
+	z->parent = y;
+	if (y == D->NIL) {
+		D->root = z;
+	}
+	else if (KEY_CMP(z->key, y->key) < 0) {
+		y->left = z; 
+	}
+	else { y->right = z;}
+	z->left = D->NIL;
+	z->right = D->NIL;
+	z->color = RED;
+	RB_InsertFixUp(D, z);
+	D->size ++;
+}
+
 // transplant()
 // helper function for delete
 void transplant(Dictionary D, Node u, Node v) {
@@ -301,55 +319,15 @@ void transplant(Dictionary D, Node u, Node v) {
 	}
 }
 
-// delete()
-// Remove the pair whose key is k from Dictionary D.
-// Pre: lookup(D,k)!=VAL_UNDEF (i.e. D contains a pair whose key is k.)
-void delete(Dictionary D, KEY_TYPE k) {
-	Node x, y, z;
-	int y_origin_color;
-	z = treeSearch(D, D->root, k);
-	y = z;
-	y_origin_color = y->color;
-	if (z->left == D->NIL) {
-		x = z->right;
-		transplant(D, z, z->right);
-	}
-	else if (z->right == D->NIL) {
-		x = z->left;
-		transplant(D, z, z->left);
-	}
-	else {
-		treeMinimum(D, z->right);
-		y_origin_color = y->color;
-		x = y->right;
-		if (y->parent == z) {
-			x->parent = y;
-		}
-		else {
-			transplant(D, y, y->right);
-			y->right = z->right;
-			y->right->parent = y;
-		}
-		transplant(D, z, y);
-		y->left = z->left;
-		y->left->parent = y;
-		y->color = z->color;
-	}
-	if (y_origin_color == BLACK) {
-		RB_DeleteFixUp(D, x);
-	}
-	freeNode(&z);
-	D->size--;
-}
-
 // RB_DeleteFixUp()
+// helper function for delete
 void RB_DeleteFixUp(Dictionary D, Node x) {
 	Node w;
 	while ((x != D->root) && (x->color == BLACK)) {
 		if (x == x->parent->left) {
 			w = x->parent->right;
 			if (w->color == RED) {
-				W->color = BLACK;
+				w->color = BLACK;
 				x->parent->color = RED;
 				leftRotate(D, x->parent);
 				w = x->parent->right;
@@ -400,6 +378,47 @@ void RB_DeleteFixUp(Dictionary D, Node x) {
 		}
 	}
 	x->color = BLACK;
+}
+
+// delete()
+// Remove the pair whose key is k from Dictionary D.
+// Pre: lookup(D,k)!=VAL_UNDEF (i.e. D contains a pair whose key is k.)
+void delete(Dictionary D, KEY_TYPE k) {
+	Node x, y, z;
+	int y_origin_color;
+	z = treeSearch(D, D->root, k);
+	y = z;
+	y_origin_color = y->color;
+	if (z->left == D->NIL) {
+		x = z->right;
+		transplant(D, z, z->right);
+	}
+	else if (z->right == D->NIL) {
+		x = z->left;
+		transplant(D, z, z->left);
+	}
+	else {
+		treeMinimum(D, z->right);
+		y_origin_color = y->color;
+		x = y->right;
+		if (y->parent == z) {
+			x->parent = y;
+		}
+		else {
+			transplant(D, y, y->right);
+			y->right = z->right;
+			y->right->parent = y;
+		}
+		transplant(D, z, y);
+		y->left = z->left;
+		y->left->parent = y;
+		y->color = z->color;
+	}
+	if (y_origin_color == BLACK) {
+		RB_DeleteFixUp(D, x);
+	}
+	freeNode(&z);
+	D->size--;
 }
 
 // postOrderTreeWalk()
@@ -620,13 +639,13 @@ void print_post(Dictionary D, Node x) {
 // other string, prints nothing.
 void printDictionary(FILE* out, Dictionary D, const char* ord) {
 	if (D->size != 0) {
-		if (ord == "pre") {
+		if (strcmp(ord, "pre") == 0) {
 			print_pre(D, D->root);
 		}
-		else if (ord == "in") {
+		else if (strcmp(ord, "in") == 0) {
 			print_in(D, D->root);
 		}
-		else if (ord == "post") {
+		else if (strcmp(ord, "post") == 0) {
 			print_post(D, D->root);
 		}
 	}

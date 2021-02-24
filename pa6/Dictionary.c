@@ -62,7 +62,7 @@ Node newNode(KEY_TYPE k, VAL_TYPE v){
 	N->parent = NULL;
 	N->left = NULL;
 	N->right = NULL;
-	N->color = BLACK;
+	N->color = RED;
 	return(N);
 }
 
@@ -182,6 +182,8 @@ Node treeMaximum(Dictionary D, Node x) {
 
 // Manipulation procedures ----------------------------------------------------
 
+// leftRotate()
+// helper function for fixup functions
 void leftRotate(Dictionary D, Node x) {
 	Node y;
 	y= x->right;
@@ -201,6 +203,8 @@ void leftRotate(Dictionary D, Node x) {
 	x->parent = y;
 }
 
+// rightRotate()
+// helper function for fixup functions
 void rightRotate(Dictionary D, Node x) {
 	Node y;
 	y= x->left;
@@ -314,9 +318,7 @@ void transplant(Dictionary D, Node u, Node v) {
 	else {
 		u->parent->right = v;
 	}
-	if (v != D->NIL) {
-		v->parent = u->parent;
-	}
+	v->parent = u->parent;
 }
 
 // RB_DeleteFixUp()
@@ -343,7 +345,7 @@ void RB_DeleteFixUp(Dictionary D, Node x) {
 					rightRotate(D, w);
 					w = x->parent->right;
 				}
-				w->color = x->parent->color = BLACK;
+				w->color = x->parent->color;
 				x->parent->color = BLACK;
 				w->right->color = BLACK;
 				leftRotate(D, x->parent);
@@ -384,41 +386,50 @@ void RB_DeleteFixUp(Dictionary D, Node x) {
 // Remove the pair whose key is k from Dictionary D.
 // Pre: lookup(D,k)!=VAL_UNDEF (i.e. D contains a pair whose key is k.)
 void delete(Dictionary D, KEY_TYPE k) {
-	Node x, y, z;
-	int y_origin_color;
-	z = treeSearch(D, D->root, k);
-	y = z;
-	y_origin_color = y->color;
-	if (z->left == D->NIL) {
-		x = z->right;
-		transplant(D, z, z->right);
-	}
-	else if (z->right == D->NIL) {
-		x = z->left;
-		transplant(D, z, z->left);
-	}
-	else {
-		treeMinimum(D, z->right);
+	if (lookup(D,k) != VAL_UNDEF) {
+		Node x, y, z;
+		int y_origin_color;
+		z = treeSearch(D, D->root, k);
+		y = z;
 		y_origin_color = y->color;
-		x = y->right;
-		if (y->parent == z) {
-			x->parent = y;
+		if (z->left == D->NIL) {
+			x = z->right;
+			transplant(D, z, z->right);
+		}
+		else if (z->right == D->NIL) {
+			x = z->left;
+			transplant(D, z, z->left);
 		}
 		else {
-			transplant(D, y, y->right);
-			y->right = z->right;
-			y->right->parent = y;
+			y = treeMinimum(D, z->right);
+			y_origin_color = y->color;
+			x = y->right;
+			if (y->parent == z) {
+				x->parent = y;
+			}
+			else {
+				transplant(D, y, y->right);
+				y->right = z->right;
+				y->right->parent = y;
+			}
+			transplant(D, z, y);
+			y->left = z->left;
+			y->left->parent = y;
+			y->color = z->color;
 		}
-		transplant(D, z, y);
-		y->left = z->left;
-		y->left->parent = y;
-		y->color = z->color;
+		if (y_origin_color == BLACK) {
+			RB_DeleteFixUp(D, x);
+		}
+		
+		if ((forwardOn == true) || (reverseOn == true)) {
+			if (D->cursor == z) {
+				D->cursor = D->NIL;
+			}
+		}
+			
+		freeNode(&z);
+		D->size--;
 	}
-	if (y_origin_color == BLACK) {
-		RB_DeleteFixUp(D, x);
-	}
-	freeNode(&z);
-	D->size--;
 }
 
 // postOrderTreeWalk()
@@ -533,6 +544,11 @@ Node treePredecessor(Dictionary D, Node x) {
 	while ((y != D->NIL) && (KEY_CMP(x->key, y->key) < 0)) {
 		y = y->parent;
 	}
+	if ((y != D->NIL) && (KEY_CMP(x->key, y->key) == 0)) {
+		if (x->val < y->val) {
+			y = y->parent;
+		}
+	}
 	return y;
 }
 
@@ -544,15 +560,8 @@ Node treePredecessor(Dictionary D, Node x) {
 // ends the iteration and returns VAL_UNDEF. If no iteration is underway, 
 // returns VAL_UNDEF.
 VAL_TYPE next(Dictionary D) {
-	if (forwardOn == true) {
+	if (forwardOn == true || reverseOn == true) {
 		D->cursor = treeSuccessor(D, D->cursor);
-		if (D->cursor == D->NIL) {
-			return VAL_UNDEF;
-		}
-		return (D->cursor->val);
-	}
-	else if (reverseOn == true) {
-		D->cursor = treePredecessor(D, D->cursor);
 		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
@@ -570,15 +579,8 @@ VAL_TYPE next(Dictionary D) {
 // ends the iteration and returns VAL_UNDEF. If no iteration is underway, 
 // returns VAL_UNDEF. 
 VAL_TYPE prev(Dictionary D) {
-	if (forwardOn == true) {
+	if (forwardOn == true || reverseOn == true) {
 		D->cursor = treePredecessor(D, D->cursor);
-		if (D->cursor == D->NIL) {
-			return VAL_UNDEF;
-		}
-		return (D->cursor->val);
-	}
-	else if (reverseOn == true) {
-		D->cursor = treeSuccessor(D, D->cursor);
 		if (D->cursor == D->NIL) {
 			return VAL_UNDEF;
 		}
@@ -592,43 +594,43 @@ VAL_TYPE prev(Dictionary D) {
 
 // print_pre()
 // helper function for printDictionary
-void print_pre(Dictionary D, Node x) {
+void print_pre(FILE* out, Dictionary D, Node x) {
 	if(D == NULL) {
 		printf("Dictionary Error: calling print_pre() on NULL Dictionary reference\n");
 		exit(EXIT_FAILURE);
 	}
 	if (x != D->NIL) {
-		printf("%s\n", x->key);
-		print_pre(D, x->left);
-		print_pre(D, x->right);
+		fprintf(out, "%s", x->key);
+		print_pre(out, D, x->left);
+		print_pre(out, D, x->right);
 	}
 }
 
 // print_in()
 // helper function for printDictionary
-void print_in(Dictionary D, Node x) {
+void print_in(FILE* out, Dictionary D, Node x) {
 	if(D == NULL) {
 		printf("Dictionary Error: calling print_in() on NULL Dictionary reference\n");
 		exit(EXIT_FAILURE);
 	}
 	if (x != D->NIL) {
-		print_in(D, x->left);
-		printf("%s\n", x->key);
-		print_in(D, x->right);
+		print_in(out, D, x->left);
+		fprintf(out, "%s", x->key);
+		print_in(out, D, x->right);
 	}
 }
 
 // print_post()
 // helper function for printDictionary
-void print_post(Dictionary D, Node x) {
+void print_post(FILE* out, Dictionary D, Node x) {
 	if(D == NULL) {
 		printf("Dictionary Error: calling print_post() on NULL Dictionary reference\n");
 		exit(EXIT_FAILURE);
 	}
 	if (x != D->NIL) {
-		print_post(D, x->left);
-		print_post(D, x->right);
-		printf("%s\n", x->key);
+		print_post(out, D, x->left);
+		print_post(out, D, x->right);
+		fprintf(out, "%s", x->key);
 	}
 }
 
@@ -640,13 +642,13 @@ void print_post(Dictionary D, Node x) {
 void printDictionary(FILE* out, Dictionary D, const char* ord) {
 	if (D->size != 0) {
 		if (strcmp(ord, "pre") == 0) {
-			print_pre(D, D->root);
+			print_pre(out, D, D->root);
 		}
 		else if (strcmp(ord, "in") == 0) {
-			print_in(D, D->root);
+			print_in(out, D, D->root);
 		}
 		else if (strcmp(ord, "post") == 0) {
-			print_post(D, D->root);
+			print_post(out, D, D->root);
 		}
 	}
 }

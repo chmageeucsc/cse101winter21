@@ -15,24 +15,32 @@
 #include "Dictionary.h"
 
 int main () {
-	int num = 10;
-	Dictionary D = newDictionary(1);
-	printf("size = %d\n", size(D));
-	printf("unique = %d\n", getUnique(D));
-	insert(D, "c", &num);
-	insert(D, "d", &num);
-	insert(D, "a", &num);
-	insert(D, "b", &num);
-	insert(D, "e", &num);
+	int* pI = calloc(10, sizeof(int));
+    for (int i=0; i < 10; i++) {
+		pI[i]=i+10;
+	}
+	Dictionary B = newDictionary(0);
+	insert(B, "d", &pI[0]);
+	insert(B, "d", &pI[1]);
+	insert(B, "d", &pI[2]);
+	insert(B, "d", &pI[3]);
+	insert(B, "d", &pI[4]);
+	insert(B, "d", &pI[5]);
+	insert(B, "d", &pI[6]);
+	insert(B, "d", &pI[7]);
 	
-	printDictionary(stdout, D, "pre");
-	printf("\n");
-	printDictionary(stdout, D, "in");
-	printf("\n");
-	printDictionary(stdout, D, "post");
-	printf("\n");
+	if (*beginReverse(B) != pI[7] && *currentVal(B) != pI[7]) {
+		printf("val should be pI[7]\n");
+	}
+	prev(B);
+	prev(B);
+	prev(B);
+	if (*prev(B) != pI[3] && *currentVal(B) != pI[3]) {
+		printf("val should be pI[3]\n");
+	}
 	
-	freeDictionary(&D);
+	free(pI);
+	freeDictionary(&B);
 	
 	return 0;
 }

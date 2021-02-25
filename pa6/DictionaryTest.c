@@ -13,34 +13,76 @@
 #include<string.h>
 #include<stdbool.h>
 #include "Dictionary.h"
+#define VAL_UNDEF NULL
 
 int main () {
-	int* pI = calloc(10, sizeof(int));
-    for (int i=0; i < 10; i++) {
-		pI[i]=i+10;
+	int n = 10;
+	int a = 1, b = 2, c = 3, d = 4, e = 5;
+	Dictionary A = newDictionary(0);
+	if (getUnique(A) == 1) {
+		printf("A is non-unique\n");
 	}
-	Dictionary B = newDictionary(0);
-	insert(B, "d", &pI[0]);
-	insert(B, "d", &pI[1]);
-	insert(B, "d", &pI[2]);
-	insert(B, "d", &pI[3]);
-	insert(B, "d", &pI[4]);
-	insert(B, "d", &pI[5]);
-	insert(B, "d", &pI[6]);
-	insert(B, "d", &pI[7]);
+
+	insert(A, "a", &a);
+	insert(A, "b", &b);
+	insert(A, "c", &c);
+	insert(A, "d", &d);
+	insert(A, "e", &e);
 	
-	if (*beginReverse(B) != pI[7] && *currentVal(B) != pI[7]) {
-		printf("val should be pI[7]\n");
-	}
-	prev(B);
-	prev(B);
-	prev(B);
-	if (*prev(B) != pI[3] && *currentVal(B) != pI[3]) {
-		printf("val should be pI[3]\n");
-	}
+	printf("size of A = %d\n", size(A));
+	printf("\n");
 	
-	free(pI);
+	beginForward(A);
+	printf("currentKey(A) = %s\n", currentKey(A));
+	printf("currentVal(A) = %d\n", *currentVal(A));
+	next(A);
+	printf("currentKey(A) = %s\n", currentKey(A));
+	printf("currentVal(A) = %d\n", *currentVal(A));
+	if (lookup(A, "a") != VAL_UNDEF) {
+		printf("\ndelete a\n\n");
+		delete(A, "a");
+	}
+	printf("size of A = %d\n", size(A));
+	
+	printf("\n");
+	Dictionary B = newDictionary(1);
+	if (getUnique(B) == 0) {
+		printf("B is unique\n");
+	}
+	insert(B, "a", &n);
+	insert(B, "b", &n);
+	insert(B, "c", &n);
+	insert(B, "d", &n);
+	insert(B, "e", &n);
+	
+	printf("size of B = %d\n", size(B));
+	printf("\n");
+	beginReverse(B);
+	printf("currentKey(B) = %s\n", currentKey(B));
+	printf("currentVal(B) = %d\n", *currentVal(B));
+	prev(B);
+	printf("currentKey(B) = %s\n", currentKey(B));
+	printf("currentVal(B) = %d\n", *currentVal(B));
+	
+	makeEmpty(B);
+	printf("size of B = %d\n", size(B));
+	
+	printf("\nPRE: A\n");
+	printDictionary(stdout, A, "pre");
+	printf("\n\nIN: A\n");
+	printDictionary(stdout, A, "in");
+	printf("\n\nPOST: A\n");
+	printDictionary(stdout, A, "post");
+	printf("\n\nPRE: B\n\n");
+	printDictionary(stdout, B, "pre");
+	printf("IN: B\n\n");
+	printDictionary(stdout, B, "in");
+	printf("POST: B\n\n");
+	printDictionary(stdout, B, "post");
+	printf("\n");
+	 
 	freeDictionary(&B);
+	freeDictionary(&A);
 	
 	return 0;
 }

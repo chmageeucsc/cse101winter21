@@ -124,7 +124,7 @@ int getUnique(Dictionary D) {
 // treeSearch()
 // helper function for lookup
 Node treeSearch(Dictionary D, Node x, KEY_TYPE k) {
-	while ((x != D->NIL) && (k != x->key)) {
+	while ((x != D->NIL) && (KEY_CMP(k, x->key) != 0)) {
 		if (KEY_CMP(k, x->key) < 0) {
 			x = x->left;
 		}
@@ -148,12 +148,10 @@ VAL_TYPE lookup(Dictionary D, KEY_TYPE k) {
 	if (x->key == NULL) {
 		return VAL_UNDEF;
 	}
-	if (KEY_CMP(x->key, k) == 0) {
+	else if (KEY_CMP(x->key, k) == 0) {
 		return x->val;
 	}
-	else {
-		return VAL_UNDEF;
-	}
+	return VAL_UNDEF;
 }
 
 // treeMinimum()

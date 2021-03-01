@@ -135,13 +135,13 @@ LIST_ELEMENT get(List L) {
 	return L->cursor->data;
 }
 
-LIST_ELEMENT equals(List A, List B) {
+LIST_ELEMENT listEquals(List A, List B) {
 	LIST_ELEMENT eq = 0;
 	Node N = NULL;
 	Node M = NULL;
 
 	if(A == NULL || B == NULL){
-		printf("List Error: calling equals() on NULL List reference\n");
+		printf("List Error: calling listEquals() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
 

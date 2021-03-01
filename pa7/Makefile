@@ -11,10 +11,13 @@ CLIENT         = Arithmetic
 ADT1           = BigInteger
 ADT2           = List
 TEST		   = ListTest
+BI			   = BigIntegerTest
 SOURCE         = $(CLIENT).c
 OBJECT         = $(CLIENT).o
 TEST_SOURCE    = $(TEST).c
 TEST_OBJECT    = $(TEST).o
+BI_SOURCE      = $(BI).c
+BI_OBJECT      = $(BI).o
 ADT1_SOURCE    = $(ADT1).c
 ADT1_OBJECT    = $(ADT1).o
 ADT1_HEADER    = $(ADT1).h
@@ -43,6 +46,12 @@ $(TEST) : $(TEST_OBJECT) $(ADT2_OBJECT)
 	
 $(TEST_OBJECT) : $(TEST_SOURCE) $(ADT2_OBJECT)
 	$(COMPILE) $(TEST_SOURCE)
+	
+$(BI) : $(BI_OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
+	$(LINK) $(BI) $(BI_OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
+	
+$(BI_OBJECT) : $(BI_SOURCE) $(ADT1_OBJECT) $(ADT2_OBJECT)
+	$(COMPILE) $(BI_SOURCE)
 
 clean :
 	$(REMOVE) $(CLIENT) $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
@@ -53,4 +62,5 @@ memcheck : $(CLIENT)
 checkTest : $(TEST)
 	$(MEMCHECK) $(TEST)
 	
-	
+checkBI : $(BI)
+	$(MEMCHECK) -v $(BI)

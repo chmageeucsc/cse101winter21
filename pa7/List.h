@@ -40,7 +40,7 @@ LIST_ELEMENT back(List L); // Returns back element of L.
 //Pre: length()>0, index()>=0
 LIST_ELEMENT get(List L); // Returns cursor element of L. 
 
-LIST_ELEMENT equals(List A, List B); // Returns true (1) iff Lists A and B are in same
+LIST_ELEMENT listEquals(List A, List B); // Returns true (1) iff Lists A and B are in same
 							// state, and returns false (0) otherwise.
 							
 // Manipulation procedures ----------------------------------------------------

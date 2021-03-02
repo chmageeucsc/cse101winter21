@@ -29,6 +29,7 @@ BigInteger newBigInteger() {
 	BigInteger N = malloc(sizeof(BigIntegerObj));
 	N->sign = 0;
 	N->magnitude = malloc(sizeof(long));
+	append(N->magnitude, 0);
 	return N;
 }
 
@@ -54,17 +55,30 @@ int sign(BigInteger N) {
 // compare()
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
 int compare(BigInteger A, BigInteger B) {
-	if (A->sign < B->sign) {
+	if (equals(A, B) == 1) {
+		return 0;
+	}
+	else if ((A->sign < B->sign) || (A->magnitude->length < B->magnitude->length)) {
 		return -1;
 	}
-	else if (A->sign > B->sign) {
+	else if ((A->sign > B->sign) || (A->magnitude->length > B->magnitude->length)) {
 		return 1;
 	}
-	else if (A == B) {							// FINISH LATER
-		return -1;
-	}
-	else if (equals(A, B) == 1) {
-		return 0;
+	else if (A->sign == 1 && B->sign == 1) {
+		moveFront(A);
+		moveFront(B);
+		for (int i = 0; i < A->magnitude->length; i++) {
+			if (get(A) < get(B)) {
+				return -1;
+			}
+			else if (get(A) > get(B)) {
+				return 1;
+			}
+			else {
+				moveNext(A);
+				moveNext(B);
+			}
+		}
 	}
 }
 
@@ -108,8 +122,22 @@ void negate(BigInteger N) {
 // Pre: s is a non-empty string containing only base ten digits {0,1,2,3,4,5,6,7,8,9}
 // and an optional sign {+, -} prefix.
 BigInteger stringToBigInteger(char* s) {
-	BigInteger A = newBigInteger();
-	return A;
+	BigInteger S = newBigInteger();
+	int i = 0;
+	int len = strlen(s);
+	if (s[0] != '\0') {
+		if (s[0] == "+") {
+			S->sign = 1;
+			i = 1;
+		}
+		else if (s[0] == "-") {
+			S->sign = -1;
+			i = 1;
+		}
+		for (i; i < len; i++){
+			append(S->magnitude, s[i]);
+		}
+	}
 }
 
 // copy()

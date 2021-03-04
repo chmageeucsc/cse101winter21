@@ -126,8 +126,8 @@ void negate(BigInteger N) {
 // Pre: s is a non-empty string containing only base ten digits {0,1,2,3,4,5,6,7,8,9}
 // and an optional sign {+, -} prefix.
 BigInteger stringToBigInteger(char* s) {
-	int slen, end = 0;
-	//char str [POWER] = "000000000";
+	int slen, end = 0, j = 0;
+	char str [POWER] = "000000000";
 	for(slen = 0; s[slen] != '\0'; ++slen);
 	BigInteger S = newBigInteger();
 	S->sign = 1;
@@ -141,13 +141,18 @@ BigInteger stringToBigInteger(char* s) {
 		}
 		for (int i = slen -1; i >= end; i--){
 			if( s[i] >= '0' && s[i] <= '9' ){
-				printf("number: %d\n", s[i]);
-				prepend(S->magnitude, s[i]);
+				str[POWER-1-j] = s[i];
+				j++;
+				if ((j == POWER) || (i == end)) {
+					prepend(S->magnitude, atol(str));
+					j = 0;
+					for (int x = 0; x < POWER; x++) {
+						str[x] = '0';
+					}
+				}
 			}
 		}
 	}
-	printList(stdout, S->magnitude);
-	printf("\n");
 	return S;
 }
 
@@ -204,5 +209,6 @@ BigInteger prod(BigInteger A, BigInteger B) {
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE* out, BigInteger N) {
-	
+	printf("%0*d", POWER, 123456789);
+	printList(out, N->magnitude);
 }

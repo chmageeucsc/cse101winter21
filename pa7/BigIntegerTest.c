@@ -14,7 +14,11 @@
 #include "BigInteger.h"
 
 int main() {
-	BigInteger N = stringToBigInteger("123");
+	printf("string is 1234567899876543\n");
+	BigInteger N = stringToBigInteger("1234567899876543");
+	
+	printBigInteger(stdout, N);
+	printf("\n");
 	
 	//printf("sign: %d\n", sign(N));
 	
@@ -32,11 +36,6 @@ int main() {
 	
 	freeBigInteger(&M);*/
 	
-	char s [9] = "7302740";
-	atol(s);
-	for (int i = 0; i < 9; i++) {
-		printf("%ld\n", s[9-1-i]);
-	}
 	
 	freeBigInteger(&N);
 	

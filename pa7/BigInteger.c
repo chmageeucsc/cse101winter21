@@ -10,8 +10,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "BigInteger.h"
 #include "List.h"
+
+#define BASE 1000000000
+#define POWER 9
 
 // structs --------------------------------------------------------------------
 
@@ -28,8 +32,7 @@ typedef struct BigIntegerObj{
 BigInteger newBigInteger() {
 	BigInteger N = malloc(sizeof(BigIntegerObj));
 	N->sign = 0;
-	N->magnitude = malloc(sizeof(long));
-	append(N->magnitude, 0);
+	N->magnitude = newList();
 	return N;
 }
 
@@ -37,9 +40,9 @@ BigInteger newBigInteger() {
 // Frees heap memory associated with *pN, sets *pN to NULL.
 void freeBigInteger(BigInteger* pN) {
 	if(pN != NULL && *pN != NULL) { 
-		free((*pN)->magnitude);
-	free(*pN);
-	*pN = NULL;
+		freeList(&(*pN)->magnitude);
+		free(*pN);
+		*pN = NULL;
 	}
 }
 
@@ -55,31 +58,32 @@ int sign(BigInteger N) {
 // compare()
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
 int compare(BigInteger A, BigInteger B) {
-	if (equals(A, B) == 1) {
-		return 0;
-	}
-	else if ((A->sign < B->sign) || (A->magnitude->length < B->magnitude->length)) {
+	if ((A->sign < B->sign) || (length(A->magnitude) < length(B->magnitude))) {
 		return -1;
 	}
-	else if ((A->sign > B->sign) || (A->magnitude->length > B->magnitude->length)) {
+	else if ((A->sign > B->sign) || (length(A->magnitude) > length(B->magnitude))) {
 		return 1;
 	}
 	else if (A->sign == 1 && B->sign == 1) {
-		moveFront(A);
-		moveFront(B);
-		for (int i = 0; i < A->magnitude->length; i++) {
-			if (get(A) < get(B)) {
+		moveFront(A->magnitude);
+		moveFront(B->magnitude);
+		for (int i = 0; i < length(A->magnitude); i++) {
+			if (get(A->magnitude) < get(B->magnitude)) {
 				return -1;
 			}
-			else if (get(A) > get(B)) {
+			else if (get(A->magnitude) > get(B->magnitude)) {
 				return 1;
 			}
 			else {
-				moveNext(A);
-				moveNext(B);
+				moveNext(A->magnitude);
+				moveNext(B->magnitude);
 			}
 		}
 	}
+	//if (equals(A, B) == 1) {
+	//	return 0;
+	//}
+	return 0;
 }
 
 // equals()
@@ -122,22 +126,29 @@ void negate(BigInteger N) {
 // Pre: s is a non-empty string containing only base ten digits {0,1,2,3,4,5,6,7,8,9}
 // and an optional sign {+, -} prefix.
 BigInteger stringToBigInteger(char* s) {
+	int slen, end = 0;
+	//char str [POWER] = "000000000";
+	for(slen = 0; s[slen] != '\0'; ++slen);
 	BigInteger S = newBigInteger();
-	int i = 0;
-	int len = strlen(s);
+	S->sign = 1;
 	if (s[0] != '\0') {
-		if (s[0] == "+") {
-			S->sign = 1;
-			i = 1;
+		if (s[0] == '+') {
+			end = 1;
 		}
-		else if (s[0] == "-") {
+		else if (s[0] == '-') {
 			S->sign = -1;
-			i = 1;
+			end = 1;
 		}
-		for (i; i < len; i++){
-			append(S->magnitude, s[i]);
+		for (int i = slen -1; i >= end; i--){
+			if( s[i] >= '0' && s[i] <= '9' ){
+				printf("number: %d\n", s[i]);
+				prepend(S->magnitude, s[i]);
+			}
 		}
 	}
+	printList(stdout, S->magnitude);
+	printf("\n");
+	return S;
 }
 
 // copy()

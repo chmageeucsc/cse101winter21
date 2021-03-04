@@ -5,6 +5,7 @@
 #  make clean               removes all binaries
 #  make memcheck            tests for memory leaks
 #  make checkTest           test for ListTest
+#  make checkBI             test for BigIntegerTest
 #------------------------------------------------------------------------------
 
 CLIENT         = Arithmetic

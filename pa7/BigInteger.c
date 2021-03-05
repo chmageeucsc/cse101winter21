@@ -209,6 +209,12 @@ BigInteger prod(BigInteger A, BigInteger B) {
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE* out, BigInteger N) {
-	printf("%0*d", POWER, 123456789);
-	printList(out, N->magnitude);
+	if (N->sign == -1) {
+		fprintf(out, "-");
+	}
+	moveFront(N->magnitude);
+	while (index(N->magnitude) != -1) {
+		fprintf(out, "%0*ld", POWER, get(N->magnitude));
+		moveNext(N->magnitude);
+	}
 }

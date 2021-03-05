@@ -161,9 +161,17 @@ BigInteger stringToBigInteger(char* s) {
 BigInteger copy(BigInteger N) {
 	BigInteger copy = newBigInteger();
 	copy->sign = N->sign;
+	free(copy->magnitude);
 	copy->magnitude = copyList(N->magnitude);
 	return copy;
 }
+
+// normalize()
+// helper function for add, subtract, and multiply
+int normalizeList(List L) {
+	
+}
+
 
 // add()
 // Places the sum of A and B in the existing BigInteger S, overwriting its

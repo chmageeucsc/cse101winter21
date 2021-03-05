@@ -24,9 +24,19 @@ int main() {
 	printBigInteger(stdout, M);
 	printf("\n");
 	
-	//printf("sign: %d\n", sign(N));
+	BigInteger NN = copy(N);
 	
-	/*BigInteger M = stringToBigInteger("+1234");
+	if (compare(N, NN) == 0) {
+		printf("equal\n");
+	}
+	else if (compare(N, NN) == 1) {
+		printf("N > NN\n");
+	}
+	else if (compare(N, NN) == -1) {
+		printf("N < NN\n");
+	}
+	
+	printf("sign: %d\n", sign(N));
 	
 	if (compare(N, M) == 0) {
 		printf("equal\n");
@@ -36,11 +46,9 @@ int main() {
 	}
 	else if (compare(N, M) == -1) {
 		printf("N < M\n");
-	}
+	}	
 	
-	freeBigInteger(&M);*/
-	
-	
+	freeBigInteger(&NN);
 	freeBigInteger(&M);
 	freeBigInteger(&N);
 	

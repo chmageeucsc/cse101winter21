@@ -173,132 +173,94 @@ BigInteger copy(BigInteger N) {
 // helper function for add, subtract, and multiply
 int normalizeList(List L) {
 	moveBack(L);
-	
-	while (index(L) != ) {
-		if (get(L) > (BASE-1)) {
+	while(index(L) != 0) {
+		if (get(L) > BASE-1) {
 			set(L, get(L) - BASE);
 			movePrev(L);
-			if (index(L) == 0) {
-				prepend(L, 1);
-				return 1;
-			}
 			set(L, get(L) + 1);
 		}
-		if (get(L) < 0) {
+		else if (get(L) < 0) {
 			set(L, get(L) + BASE);
 			movePrev(L);
-			set(L, get(L) -1);
-			if ((index(L) == 0) && (get(L) < 0)) {
-				moveFront(L);
-				if (front(L) < 0) {
-					while (index(L) != length(L)) {
-						set(L, get(L)*(-1));
-						moveNext(L);
-					}
-					normalizeList(L);
-					return -1;
-				}
-			}
+			set(L, get(L) - 1);
 		}
+		else { movePrev(L);}
 	}
-	
-	return 1;
-	
-	/*
-	if (front(L) > 0) {
-		while (index(L) != 0) {
-			if (get(L) > (BASE-1)) {
-				set(L, get(L) - BASE);
-				movePrev(L);
-				set(L, get(L) + 1);
-				moveNext(L);
-			}
-			movePrev(L);
-		}
-		if (get(L) > (BASE-1)) {
-			set(L, get(L) - BASE);
-			prepend(L, 1);
-		} 
+	if (front(L) > BASE-1) {
+		prepend(L, 1);
 		return 1;
 	}
 	else if (front(L) < 0) {
-		while (index(L) != 0) {
-			if (get(L) < 0) {
-				set(L, get(L) + BASE);
-				movePrev(L);
-				set(L, get(L) - 1);
-				moveNext(L);
-			}
+		moveBack(L);
+		while (index(L) != -1) {
+			set(L, get(L)*(-1));
 			movePrev(L);
 		}
-		moveFront(L);
-		if (front(L) < 0) {
-			while (index(L) != length(L)) {
-				set(L, get(L)*(-1));
-				moveNext(L);
-			}
-			normalizeList(L);
-			return -1;
-		}
+		normalizeList(L);
+		return -1;
 	}
 	return 1;
-	
-	*/
 }
 
 // add()
 // Places the sum of A and B in the existing BigInteger S, overwriting its
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B) {
+	while (length(A->magnitude) < length(B->magnitude)) {
+		prepend(A->magnitude, 0);
+	}
+	while (length(B->magnitude) < length(A->magnitude)) {
+		prepend(B->magnitude, 0);
+	}
 	moveBack(A->magnitude);
 	moveBack(B->magnitude);
 	while (index(B->magnitude) != -1) {
 		long ans;
 		if ((sign(A) == 1) && (sign(B) == 1)) {
 			ans = get(A->magnitude) + get(B->magnitude);
-			printf("A + B = %ld\n", ans);
+			//printf("A + B = %ld\n", ans);
 		}
 		else if ((sign(A) == -1) && (sign(B) == 1)) {
 			ans = (get(B->magnitude) - get(A->magnitude));
-			printf("-A + B = %ld\n", ans);
+			//printf("-A + B = %ld\n", ans);
 		}
 		else if ((sign(A) == 1) && (sign(B) == -1)) {
 			ans = get(A->magnitude) - get(B->magnitude);
-			printf("A + -B = %ld\n", ans);
+			//printf("A + -B = %ld\n", ans);
 		}
 		else if ((sign(A) == -1) && (sign(B) == -1)) {
 			ans = (get(A->magnitude)*(-1)) - (get(B->magnitude));
-			printf("-A + -B = %ld\n", ans);
+			//printf("-A + -B = %ld\n", ans);
 		}
 		prepend(S->magnitude, ans);
 		movePrev(A->magnitude);
 		movePrev(B->magnitude);
 	}
-	normalizeList(S->magnitude);
+	S->sign = normalizeList(S->magnitude);
 }
 
 // sum()
 // Returns a reference to a new BigInteger object representing A + B.
 BigInteger sum(BigInteger A, BigInteger B) {
-	return A;
+	BigInteger S = newBigInteger();
+	add(S, A, B);
+	return S;
 }
 
 // subtract()
 // Places the difference of A and B in the existing BigInteger D, overwriting
 // its current state: D = A - B
 void subtract(BigInteger D, BigInteger A, BigInteger B) {
-	moveFront(B->magnitude);
-	while (index(B->magnitude) != length(B->magnitude)-1) {
-		set(B->magnitude, get(B->magnitude)*(-1));
-		moveNext(B->magnitude);
-	}
+	negate(B);
 	add(D, A, B);
 }
 
 // diff()
 // Returns a reference to a new BigInteger object representing A - B.
 BigInteger diff(BigInteger A, BigInteger B) {
-	return A;
+	BigInteger D = newBigInteger();
+	subtract(D, A, B);
+	return D;
 }
 
 // multiply()

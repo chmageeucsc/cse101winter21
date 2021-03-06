@@ -14,50 +14,54 @@
 #include "BigInteger.h"
 
 int main() {
-	BigInteger N = stringToBigInteger("111");
+	BigInteger A = stringToBigInteger("25137801");
+	BigInteger B = stringToBigInteger("482231");
+	BigInteger AB = sum(A, B);
 	
-	printBigInteger(stdout, N);
+	//subtract(AB, A, B);
+	printf("25137801 + 482231 = ");
+	printBigInteger(stdout, AB);
 	printf("\n");
 	
-	BigInteger M = stringToBigInteger("-222");
+	BigInteger C = stringToBigInteger("-25137801");
+	BigInteger D = stringToBigInteger("482231");
+	BigInteger CD = sum(C, D);
 	
-	printBigInteger(stdout, M);
+	//subtract(CD, C, D);
+	printf("-25137801 + 482231 = ");
+	printBigInteger(stdout, CD);
 	printf("\n");
 	
-	BigInteger NM = newBigInteger();
+	BigInteger E = stringToBigInteger("25137801");
+	BigInteger F = stringToBigInteger("-482231");
+	BigInteger EF = sum(E, F);
 	
-	add(NM, N, M);
-	
-	printBigInteger(stdout, NM);
+	//subtract(EF, E, F);
+	printf("25137801 + -482231 = ");
+	printBigInteger(stdout, EF);
 	printf("\n");
 	
-	/*BigInteger NN = copy(N);
+	BigInteger G = stringToBigInteger("-25137801");
+	BigInteger H = stringToBigInteger("-482231");
+	BigInteger GH = sum(G, H);
 	
-	if (compare(N, NN) == 0) {
-		printf("equal\n");
-	}
-	else if (compare(N, NN) == 1) {
-		printf("N > NN\n");
-	}
-	else if (compare(N, NN) == -1) {
-		printf("N < NN\n");
-	}
+	//subtract(GH, G, H);
+	printf("-25137801 + -482231 = ");
+	printBigInteger(stdout, GH);
+	printf("\n");
 	
-	printf("sign: %d\n", sign(N));
-	
-	if (compare(N, M) == 0) {
-		printf("equal\n");
-	}
-	else if (compare(N, M) == 1) {
-		printf("N > M\n");
-	}
-	else if (compare(N, M) == -1) {
-		printf("N < M\n");
-	}	*/
-	
-	freeBigInteger(&NM);
-	freeBigInteger(&M);
-	freeBigInteger(&N);
+	freeBigInteger(&GH);
+	freeBigInteger(&H);
+	freeBigInteger(&G);
+	freeBigInteger(&EF);
+	freeBigInteger(&F);
+	freeBigInteger(&E);
+	freeBigInteger(&CD);
+	freeBigInteger(&D);
+	freeBigInteger(&C);
+	freeBigInteger(&AB);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	return 0;
 }

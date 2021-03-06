@@ -14,17 +14,24 @@
 #include "BigInteger.h"
 
 int main() {
-	BigInteger N = stringToBigInteger("10000");
+	BigInteger N = stringToBigInteger("111");
 	
 	printBigInteger(stdout, N);
 	printf("\n");
 	
-	BigInteger M = stringToBigInteger("20000");
+	BigInteger M = stringToBigInteger("-222");
 	
 	printBigInteger(stdout, M);
 	printf("\n");
 	
-	BigInteger NN = copy(N);
+	BigInteger NM = newBigInteger();
+	
+	add(NM, N, M);
+	
+	printBigInteger(stdout, NM);
+	printf("\n");
+	
+	/*BigInteger NN = copy(N);
 	
 	if (compare(N, NN) == 0) {
 		printf("equal\n");
@@ -46,9 +53,9 @@ int main() {
 	}
 	else if (compare(N, M) == -1) {
 		printf("N < M\n");
-	}	
+	}	*/
 	
-	freeBigInteger(&NN);
+	freeBigInteger(&NM);
 	freeBigInteger(&M);
 	freeBigInteger(&N);
 	

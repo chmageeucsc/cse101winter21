@@ -19,11 +19,12 @@ int main() {
 	BigInteger AB = sum(A, B);
 	
 	//subtract(AB, A, B);
+	//add(A,A,B);
 	printf("25137801 + 482231 = ");
 	printBigInteger(stdout, AB);
 	printf("\n");
 	
-	BigInteger C = stringToBigInteger("-25137801");
+	/*BigInteger C = stringToBigInteger("-25137801");
 	BigInteger D = stringToBigInteger("482231");
 	BigInteger CD = sum(C, D);
 	
@@ -58,7 +59,7 @@ int main() {
 	freeBigInteger(&E);
 	freeBigInteger(&CD);
 	freeBigInteger(&D);
-	freeBigInteger(&C);
+	freeBigInteger(&C);*/
 	freeBigInteger(&AB);
 	freeBigInteger(&B);
 	freeBigInteger(&A);

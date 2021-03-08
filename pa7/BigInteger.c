@@ -61,7 +61,10 @@ int sign(BigInteger N) {
 // compare()
 // Returns -1 if A<B, 1 if A>B, and 0 if A=B.
 int compare(BigInteger A, BigInteger B) {
-	if ((A->sign < B->sign) || (length(A->magnitude) < length(B->magnitude))) {
+	if (equals(A, B) == 1) {
+		return 0;
+	}
+	else if ((A->sign < B->sign) || (length(A->magnitude) < length(B->magnitude))) {
 		return -1;
 	}
 	else if ((A->sign > B->sign) || (length(A->magnitude) > length(B->magnitude))) {
@@ -83,9 +86,6 @@ int compare(BigInteger A, BigInteger B) {
 			}
 		}
 	}
-	//if (equals(A, B) == 1) {
-	//	return 0;
-	//}
 	return 0;
 }
 
@@ -156,6 +156,12 @@ BigInteger stringToBigInteger(char* s) {
 			}
 		}
 	}
+	if((length(S->magnitude) == 1) && (front(S->magnitude) == 0)) {
+		return S;
+	}
+	while (front(S->magnitude) == 0) {
+		deleteFront(S->magnitude);
+	}
 	return S;
 }
 
@@ -175,14 +181,18 @@ int normalizeList(List L) {
 	moveBack(L);
 	while(index(L) != 0) {
 		if (get(L) > BASE-1) {
-			set(L, get(L) - BASE);
-			movePrev(L);
-			set(L, get(L) + 1);
+			while (get(L) > BASE-1) {
+				set(L, get(L) - BASE);
+				movePrev(L);
+				set(L, get(L) + 1);
+			}
 		}
 		else if (get(L) < 0) {
-			set(L, get(L) + BASE);
-			movePrev(L);
-			set(L, get(L) - 1);
+			while (get(L) < 0) {
+				set(L, get(L) + BASE);
+				movePrev(L);
+				set(L, get(L) - 1);
+			}
 		}
 		else { movePrev(L);}
 	}
@@ -202,10 +212,27 @@ int normalizeList(List L) {
 	return 1;
 }
 
+// scalar()
+// helper function for mult and add
+BigInteger scalar(BigInteger A, long num) {
+	BigInteger temp = newBigInteger();
+	for (moveBack(A->magnitude); index(A->magnitude) != -1; movePrev(A->magnitude)) {
+		long ans;
+		ans = get(A->magnitude) * num;
+		prepend(temp->magnitude, ans);
+	}
+	normalizeList(temp->magnitude);
+	return temp;
+}
+
 // add()
 // Places the sum of A and B in the existing BigInteger S, overwriting its
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B) {
+	int same = 0;
+	if (equals(S, A) == 1) {
+		same = 1;
+	}
 	while (length(A->magnitude) < length(B->magnitude)) {
 		prepend(A->magnitude, 0);
 	}
@@ -235,6 +262,9 @@ void add(BigInteger S, BigInteger A, BigInteger B) {
 		prepend(S->magnitude, ans);
 		movePrev(A->magnitude);
 		movePrev(B->magnitude);
+		if (same == 1) {
+			deleteBack(S->magnitude);
+		}
 	}
 	S->sign = normalizeList(S->magnitude);
 }
@@ -267,13 +297,24 @@ BigInteger diff(BigInteger A, BigInteger B) {
 // Places the product of A and B in the existing BigInteger P, overwriting
 // its current state: P = A*B
 void multiply(BigInteger P, BigInteger A, BigInteger B) {
-	
+	int shift = 0;
+	for (moveBack(B->magnitude); index(B->magnitude) != -1; movePrev(B->magnitude)) {
+		BigInteger T = scalar(A, get(B->magnitude));
+		for (int i = shift; i > 0; i++) {
+			append(T->magnitude, 0);
+		}
+		add(P, P, T);
+		shift++;
+		freeBigInteger(&T);
+	}
 }
 
 // prod()
 // Returns a reference to a new BigInteger object representing A*B
 BigInteger prod(BigInteger A, BigInteger B) {
-	return A;
+	BigInteger P = newBigInteger();
+	multiply(P, A, B);
+	return P;
 }
 
 // Other operations -----------------------------------------------------------

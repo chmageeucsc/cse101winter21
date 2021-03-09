@@ -14,11 +14,11 @@
 #include "BigInteger.h"
 #include "List.h"
 
-//#define BASE 1000000000
-//#define POWER 9
+#define BASE 1000000000
+#define POWER 9
 
-#define BASE 100
-#define POWER 2
+//#define BASE 100
+//#define POWER 2
 
 // structs --------------------------------------------------------------------
 
@@ -185,19 +185,29 @@ int normalizeList(List L) {
 				set(L, get(L) - BASE);
 				movePrev(L);
 				set(L, get(L) + 1);
+				moveNext(L);
 			}
+			movePrev(L);
 		}
 		else if (get(L) < 0) {
 			while (get(L) < 0) {
 				set(L, get(L) + BASE);
 				movePrev(L);
 				set(L, get(L) - 1);
+				moveNext(L);
 			}
+			movePrev(L);
 		}
 		else { movePrev(L);}
 	}
 	if (front(L) > BASE-1) {
-		prepend(L, 1);
+		moveFront(L);
+		int carry = 0;
+		while (front(L) > BASE-1) {
+			set(L, get(L) - BASE);
+			carry++;
+		}
+		prepend(L, carry);
 		return 1;
 	}
 	else if (front(L) < 0) {
@@ -209,21 +219,21 @@ int normalizeList(List L) {
 		normalizeList(L);
 		return -1;
 	}
+	while (front(L) == 0) {
+		deleteFront(L);
+	}
 	return 1;
 }
 
-// scalar()
+/*// scalar()
 // helper function for mult and add
-BigInteger scalar(BigInteger A, long num) {
-	BigInteger temp = newBigInteger();
+void scalar(BigInteger temp, BigInteger A, long num) {
 	for (moveBack(A->magnitude); index(A->magnitude) != -1; movePrev(A->magnitude)) {
 		long ans;
 		ans = get(A->magnitude) * num;
 		prepend(temp->magnitude, ans);
 	}
-	normalizeList(temp->magnitude);
-	return temp;
-}
+}*/
 
 // add()
 // Places the sum of A and B in the existing BigInteger S, overwriting its
@@ -297,16 +307,43 @@ BigInteger diff(BigInteger A, BigInteger B) {
 // Places the product of A and B in the existing BigInteger P, overwriting
 // its current state: P = A*B
 void multiply(BigInteger P, BigInteger A, BigInteger B) {
-	int shift = 0;
-	for (moveBack(B->magnitude); index(B->magnitude) != -1; movePrev(B->magnitude)) {
-		BigInteger T = scalar(A, get(B->magnitude));
-		for (int i = shift; i > 0; i++) {
-			append(T->magnitude, 0);
-		}
-		add(P, P, T);
-		shift++;
-		freeBigInteger(&T);
+	BigInteger tempA = copy(A);
+	BigInteger tempB = copy(B);
+	if ((equals(P, A) == 1) || (equals(P, B) == 1)) {
+		makeZero(P);
 	}
+	int shift = 0, newshift = 0;
+	while (length(tempA->magnitude) < length(tempB->magnitude)) {
+		prepend(tempA->magnitude, 0);
+	}
+	while (length(tempB->magnitude) < length(tempA->magnitude)) {
+		prepend(tempB->magnitude, 0);
+	}
+	long ans;
+	if (length(P->magnitude) == 0) {
+		append(P->magnitude, 0);
+	}
+	for (moveBack(tempB->magnitude); index(tempB->magnitude) != -1; movePrev(tempB->magnitude)) {
+		for (moveBack(tempA->magnitude); index(tempA->magnitude) != -1; movePrev(tempA->magnitude)) {
+			moveBack(P->magnitude);
+			ans = get(tempA->magnitude) * get(tempB->magnitude);
+			for (int i = 0; i < shift; i++) {
+				movePrev(P->magnitude);
+			}
+			//prepend(P->magnitude, ans);
+			set(P->magnitude, get(P->magnitude) + ans);
+			normalizeList(P->magnitude);
+			shift++;
+		}
+		newshift++;
+		shift = newshift;
+		//normalizeList(P->magnitude);
+	}
+	if (((sign(tempA) == -1) && (sign(tempB) == 1)) || ((sign(tempA) == 1) && (sign(tempB) == -1))) {
+		P->sign = -1;
+	}
+	freeBigInteger(&tempA);
+	freeBigInteger(&tempB);
 }
 
 // prod()
@@ -329,5 +366,6 @@ void printBigInteger(FILE* out, BigInteger N) {
 	while (index(N->magnitude) != -1) {
 		fprintf(out, "%0*ld", POWER, get(N->magnitude));
 		moveNext(N->magnitude);
+		fprintf(out, " ");
 	}
 }

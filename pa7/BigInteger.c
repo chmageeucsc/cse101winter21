@@ -113,12 +113,14 @@ void makeZero(BigInteger N) {
 // Reverses the sign of N: positive <--> negative. Does nothing if N is in the
 // zero state.
 void negate(BigInteger N) {
+	printf("sign = %d\n", sign(N));
 	if (N->sign == -1) {
 		N->sign = 1;
 	}
 	else if (N->sign == 1) {
 		N->sign = -1;
 	}
+	printf("sign = %d\n", sign(N));
 }
 
 // BigInteger Arithmetic operations -----------------------------------------------
@@ -239,6 +241,19 @@ void scalar(BigInteger temp, BigInteger A, long num) {
 // Places the sum of A and B in the existing BigInteger S, overwriting its
 // current state: S = A + B
 void add(BigInteger S, BigInteger A, BigInteger B) {
+	if (((sign(A) == 1) && (sign(B) == -1)) || ((sign(A) == -1) && (sign(B) == 1))) {
+		if (listEquals(A->magnitude, B->magnitude) == 1) {
+			makeZero(S);
+			prepend(S->magnitude, 0);
+			S->sign = 0;
+			return;
+		}
+	}
+	if ((equals(S, A) != 1) && (equals(S, B) != 1)) {
+		if (length(S->magnitude) != 0) {
+			makeZero(S);
+		}
+	}
 	int same = 0;
 	if (equals(S, A) == 1) {
 		same = 1;

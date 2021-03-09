@@ -15,36 +15,148 @@
 
 int main() {
 	
-	BigInteger A = stringToBigInteger("+111122223333");
-	BigInteger B = stringToBigInteger("+111122223333");
+	BigInteger A = stringToBigInteger("111122223333");
+	BigInteger B = stringToBigInteger("111122223333");
 	BigInteger C = newBigInteger();
-	
+	BigInteger D = stringToBigInteger("12348148518469129628889");
 	subtract(C,A,B);
 	
 	freeBigInteger(&B);
 	
 	B = stringToBigInteger("121122223333");
-	printBigInteger(stdout, B);
-	printf(" -> B\n");
-	BigInteger D = stringToBigInteger("-10000000000");
+
 	subtract(C,A,B);
-	printBigInteger(stdout, C);
-	printf("\n");
+		
+	freeBigInteger(&D);
+	
+	freeBigInteger(&B);
+	B = stringToBigInteger("101122223333");
+	D = stringToBigInteger("10000000000");
+	subtract(C,A,B);
 	
 	freeBigInteger(&D);
-	printf("negate\n");
 	negate(B);
 	D = stringToBigInteger("212244446666");
-	printBigInteger(stdout, A);
-	printf(" -> B negated\n");
-	printBigInteger(stdout, B);
-	printf("\n");
 	subtract(C,A,B);
 	
 	if (equals(C,D) != 1) {
 		printBigInteger(stdout, C);
 		printf("\n");
 		printBigInteger(stdout, D);
+		printf("\n");
+	}
+	
+	freeBigInteger(&A);
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&D);
+	
+	A = stringToBigInteger("111122223333");
+	B = stringToBigInteger("111122223333");
+	C = newBigInteger();
+	D = stringToBigInteger("12348148518469129628889");
+	
+	multiply(C,A,B);
+	
+	if (sign(C) != 1) {
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	if (equals(C,D) != 1) {
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}
+	
+	negate(B);
+	negate(D);
+	
+	multiply(C,A,B);
+	
+	if (sign(C) != -1) {
+		printf("1 2\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	if (equals(C,D) != 1) {
+		printf("3 4\n");
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}
+	
+	makeZero(B);
+	
+	multiply(C,A,B);
+	
+	if (sign(C) != 0) {
+		printf("5\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	freeBigInteger(&A);
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&D);
+	
+	A = stringToBigInteger("-111122223333");
+	B = stringToBigInteger("111122223333");
+	D = stringToBigInteger("-12348148518469129628889");
+	
+	C = prod(A,B);
+	
+	if (sign(C) != -1) {
+		printf("1 2\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	if (equals(C,D) != 1) {
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}
+	
+	freeBigInteger(&C);
+	
+	negate(B);
+	negate(D);
+	
+	C = prod(A,B);
+	
+	if (sign(C) != 1) {
+		printf("3 4\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	if (equals(C,D) != 1) {
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}
+	
+	makeZero(B);
+	freeBigInteger(&C);
+	
+	C = prod(A,B);
+	
+	if (sign(C) != 0) {
+		printf("5\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
 		printf("\n");
 	}
 	

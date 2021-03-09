@@ -113,14 +113,12 @@ void makeZero(BigInteger N) {
 // Reverses the sign of N: positive <--> negative. Does nothing if N is in the
 // zero state.
 void negate(BigInteger N) {
-	printf("sign = %d\n", sign(N));
 	if (N->sign == -1) {
 		N->sign = 1;
 	}
 	else if (N->sign == 1) {
 		N->sign = -1;
 	}
-	printf("sign = %d\n", sign(N));
 }
 
 // BigInteger Arithmetic operations -----------------------------------------------
@@ -308,6 +306,7 @@ BigInteger sum(BigInteger A, BigInteger B) {
 void subtract(BigInteger D, BigInteger A, BigInteger B) {
 	negate(B);
 	add(D, A, B);
+	negate(B);
 }
 
 // diff()
@@ -322,11 +321,19 @@ BigInteger diff(BigInteger A, BigInteger B) {
 // Places the product of A and B in the existing BigInteger P, overwriting
 // its current state: P = A*B
 void multiply(BigInteger P, BigInteger A, BigInteger B) {
+	if ((length(A->magnitude) == 0) || (length(B->magnitude) == 0)) {
+		if (length(P->magnitude) > 0) {
+			makeZero(P);
+		}
+		else {
+			append(P->magnitude, 0);
+			P->sign = 0;
+		}
+		return;
+	}
 	BigInteger tempA = copy(A);
 	BigInteger tempB = copy(B);
-	if ((equals(P, A) == 1) || (equals(P, B) == 1)) {
-		makeZero(P);
-	}
+	makeZero(P);
 	int shift = 0, newshift = 0;
 	while (length(tempA->magnitude) < length(tempB->magnitude)) {
 		prepend(tempA->magnitude, 0);
@@ -356,6 +363,9 @@ void multiply(BigInteger P, BigInteger A, BigInteger B) {
 	}
 	if (((sign(tempA) == -1) && (sign(tempB) == 1)) || ((sign(tempA) == 1) && (sign(tempB) == -1))) {
 		P->sign = -1;
+	}
+	else if (((sign(tempA) == 1) && (sign(tempB) == 1)) || ((sign(tempA) == -1) && (sign(tempB) == -1))) {
+		P->sign = 1;
 	}
 	freeBigInteger(&tempA);
 	freeBigInteger(&tempB);

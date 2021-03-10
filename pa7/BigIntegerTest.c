@@ -15,10 +15,101 @@
 
 int main() {
 	
-	BigInteger A = stringToBigInteger("111122223333");
-	BigInteger B = stringToBigInteger("111122223333");
+	BigInteger A = stringToBigInteger("+111122223333");
+	BigInteger B = stringToBigInteger("+222211110000");
 	BigInteger C = newBigInteger();
-	BigInteger D = stringToBigInteger("12348148518469129628889");
+	BigInteger D = stringToBigInteger("+333333333333");
+	add(C,A,B);
+	
+	if (equals(C,D) != 1) {
+		printf("test 1\n");
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}
+	
+	freeBigInteger(&B);
+	freeBigInteger(&D);
+	
+	B = stringToBigInteger("-111122223333");
+	add(C,A,B);
+	if (sign(C) != 0) {
+		printf("test 2\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	freeBigInteger(&B);
+	
+	B = stringToBigInteger("-110122223333");
+	D = stringToBigInteger("1000000000");
+	add(C,A,B);
+	
+	if (sign(C) != 1) {
+		printf("test 31\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	if (equals(C,D) != 1) {
+		printf("test 32\n");
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}
+
+	freeBigInteger(&B);
+	freeBigInteger(&D);
+		
+	B = stringToBigInteger("-112122223333");
+	D = stringToBigInteger("-1000000000");
+	
+	add(C,A,B);
+	
+	if (sign(C) != -1) {
+		printf("test 41\n");
+		printf("sign of C = %d\nC = ", sign(C));
+		printBigInteger(stdout, C);
+		printf("\n");
+	}
+	
+	if (equals(C,D) != 1) {
+		printf("test 42\n");
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}
+	
+	freeBigInteger(&D);
+	freeBigInteger(&A);
+	
+	A = stringToBigInteger("-221211110000");
+	D = stringToBigInteger("-333333333333");
+	
+	add(C,A,B);
+	
+	if (equals(C,D) != 1) {
+		printf("test 5\n");
+		printBigInteger(stdout, C);
+		printf("\n");
+		printBigInteger(stdout, D);
+		printf("\n");
+	}	
+	
+	freeBigInteger(&A);
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&D);
+	
+	A = stringToBigInteger("111122223333");
+	B = stringToBigInteger("111122223333");
+	C = newBigInteger();
+	D = stringToBigInteger("12348148518469129628889");
 	subtract(C,A,B);
 	
 	freeBigInteger(&B);
@@ -164,7 +255,6 @@ int main() {
 	freeBigInteger(&C);
 	freeBigInteger(&B);
 	freeBigInteger(&D);
-	
 	
 	/*BigInteger A = stringToBigInteger("23451531");
 	BigInteger B = stringToBigInteger("71082289");

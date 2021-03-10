@@ -181,22 +181,20 @@ int normalizeList(List L) {
 	moveBack(L);
 	while(index(L) != 0) {
 		if (get(L) > BASE-1) {
-			while (get(L) > BASE-1) {
-				set(L, get(L) - BASE);
-				movePrev(L);
-				set(L, get(L) + 1);
-				moveNext(L);
-			}
+			long sub = 0, subCarry = 0;
+			subCarry = get(L)/BASE;
+			sub = subCarry * BASE;
+			set(L, get(L) - sub);
 			movePrev(L);
+			set(L, get(L) + subCarry);
 		}
 		else if (get(L) < 0) {
-			while (get(L) < 0) {
-				set(L, get(L) + BASE);
-				movePrev(L);
-				set(L, get(L) - 1);
-				moveNext(L);
-			}
+			long ad = 0, adCarry = 0;
+			adCarry = get(L)/BASE + 1;
+			ad = adCarry * BASE;
+			set(L, get(L) + ad);
 			movePrev(L);
+			set(L, get(L) + adCarry);
 		}
 		else { movePrev(L);}
 	}
@@ -216,7 +214,18 @@ int normalizeList(List L) {
 			set(L, get(L)*(-1));
 			movePrev(L);
 		}
-		normalizeList(L);
+		moveBack(L);
+		while(index(L) != 0) {
+			if (get(L) < 0) {
+				long ad = 0, adCarry = 0;
+				adCarry = get(L)/BASE + 1;
+				ad = adCarry * BASE;
+				set(L, get(L) + ad);
+				movePrev(L);
+				set(L, get(L) + adCarry);
+			}
+			else { movePrev(L);}
+		}
 		return -1;
 	}
 	while (front(L) == 0) {
@@ -304,6 +313,11 @@ BigInteger sum(BigInteger A, BigInteger B) {
 // Places the difference of A and B in the existing BigInteger D, overwriting
 // its current state: D = A - B
 void subtract(BigInteger D, BigInteger A, BigInteger B) {
+	if (equals(A,B) == 1) {
+		makeZero(D);
+		prepend(D->magnitude, 0);
+		return;
+	}
 	negate(B);
 	add(D, A, B);
 	negate(B);
@@ -389,8 +403,9 @@ void printBigInteger(FILE* out, BigInteger N) {
 	}
 	moveFront(N->magnitude);
 	while (index(N->magnitude) != -1) {
-		fprintf(out, "%0*ld", POWER, get(N->magnitude));
+		fprintf(out, "%ld", get(N->magnitude));
+		//fprintf(out, "%0*ld", POWER, get(N->magnitude));
 		moveNext(N->magnitude);
-		fprintf(out, " ");
+		//fprintf(out, " ");
 	}
 }

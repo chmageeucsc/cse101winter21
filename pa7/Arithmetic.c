@@ -41,18 +41,50 @@ int main(int argc, char * argv[]){
 	}
 	
 	line_count = 0;
-	//char array [line_count][MAX_LEN];		// old method used from pa1 (less efficient)
 	char *array [200000];
-	
-	long n;
-	fscanf(in, "%ld", &n);
-	
 	// read each line of input file
 	while( fgets(line, MAX_LEN, in) != NULL)  {
 		array[line_count] = calloc(strlen(line) + 1, sizeof(char*));
 		strcpy(array[line_count], line);
 		line_count++;
 	}
+
+	BigInteger A = stringToBigInteger(array[1]);
+	BigInteger B = stringToBigInteger(array[3]);
+	BigInteger C = newBigInteger();
+	BigInteger D = newBigInteger();
+	BigInteger E = newBigInteger();
+	
+	printBigInteger(out, A);
+	fprintf(out, "\n\n");
+	
+	printBigInteger(out, B);
+	fprintf(out, "\n\n");
+	
+	add(C,A,B);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	subtract(C,A,B);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	subtract(C,A,A);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	for (int i = 0; i < 2; i++) {
+		add(D,A,A);
+	}
+	subtract(C,D,B);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	freeBigInteger(&E);
+	freeBigInteger(&D);
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	for (int i = 0; i < line_count; i++) {
 		free(array[i]);

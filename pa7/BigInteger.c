@@ -130,7 +130,7 @@ void negate(BigInteger N) {
 // and an optional sign {+, -} prefix.
 BigInteger stringToBigInteger(char* s) {
 	int slen, end = 0, j = 0;
-	char str [POWER] = "00";
+	char str [POWER] = "000000000";
 	for(slen = 0; s[slen] != '\0'; ++slen);
 	BigInteger S = newBigInteger();
 	S->sign = 1;
@@ -157,10 +157,8 @@ BigInteger stringToBigInteger(char* s) {
 		}
 	}
 	if((length(S->magnitude) == 1) && (front(S->magnitude) == 0)) {
+		S->sign = 0;
 		return S;
-	}
-	while (front(S->magnitude) == 0) {
-		deleteFront(S->magnitude);
 	}
 	return S;
 }
@@ -182,19 +180,19 @@ int normalizeList(List L) {
 	while(index(L) != 0) {
 		if (get(L) > BASE-1) {
 			long sub = 0, subCarry = 0;
-			subCarry = get(L)/BASE;
-			sub = subCarry * BASE;
+			subCarry = get(L)/BASE;	// number to add previous node by
+			sub = subCarry * BASE; // number to subtract current node by
 			set(L, get(L) - sub);
 			movePrev(L);
 			set(L, get(L) + subCarry);
 		}
 		else if (get(L) < 0) {
 			long ad = 0, adCarry = 0;
-			adCarry = get(L)/BASE + 1;
-			ad = adCarry * BASE;
+			adCarry = get(L)/BASE + 1; // number to subtract previous node by
+			ad = adCarry * BASE; // number to add current node by
 			set(L, get(L) + ad);
 			movePrev(L);
-			set(L, get(L) + adCarry);
+			set(L, get(L) - adCarry);
 		}
 		else { movePrev(L);}
 	}
@@ -210,10 +208,11 @@ int normalizeList(List L) {
 	}
 	else if (front(L) < 0) {
 		moveBack(L);
-		while (index(L) != -1) {
+		while (index(L) != 0) {
 			set(L, get(L)*(-1));
 			movePrev(L);
 		}
+		set(L, get(L)*(-1));
 		moveBack(L);
 		while(index(L) != 0) {
 			if (get(L) < 0) {
@@ -222,7 +221,7 @@ int normalizeList(List L) {
 				ad = adCarry * BASE;
 				set(L, get(L) + ad);
 				movePrev(L);
-				set(L, get(L) + adCarry);
+				set(L, get(L) - adCarry);
 			}
 			else { movePrev(L);}
 		}
@@ -252,7 +251,6 @@ void add(BigInteger S, BigInteger A, BigInteger B) {
 		if (listEquals(A->magnitude, B->magnitude) == 1) {
 			makeZero(S);
 			prepend(S->magnitude, 0);
-			S->sign = 0;
 			return;
 		}
 	}
@@ -262,7 +260,7 @@ void add(BigInteger S, BigInteger A, BigInteger B) {
 		}
 	}
 	int same = 0;
-	if (equals(S, A) == 1) {
+	if ((equals(S, A) == 1) || (equals(S,B) == 1)) {
 		same = 1;
 	}
 	while (length(A->magnitude) < length(B->magnitude)) {
@@ -358,6 +356,12 @@ void multiply(BigInteger P, BigInteger A, BigInteger B) {
 	long ans;
 	if (length(P->magnitude) == 0) {
 		append(P->magnitude, 0);
+		while (length(P->magnitude) < length(tempB->magnitude)) {
+		prepend(P->magnitude, 0);
+		}
+		while (length(P->magnitude) < length(tempA->magnitude)) {
+			prepend(P->magnitude, 0);
+		}
 	}
 	for (moveBack(tempB->magnitude); index(tempB->magnitude) != -1; movePrev(tempB->magnitude)) {
 		for (moveBack(tempA->magnitude); index(tempA->magnitude) != -1; movePrev(tempA->magnitude)) {
@@ -368,12 +372,12 @@ void multiply(BigInteger P, BigInteger A, BigInteger B) {
 			}
 			//prepend(P->magnitude, ans);
 			set(P->magnitude, get(P->magnitude) + ans);
-			normalizeList(P->magnitude);
+			//normalizeList(P->magnitude);
 			shift++;
 		}
 		newshift++;
 		shift = newshift;
-		//normalizeList(P->magnitude);
+		normalizeList(P->magnitude);
 	}
 	if (((sign(tempA) == -1) && (sign(tempB) == 1)) || ((sign(tempA) == 1) && (sign(tempB) == -1))) {
 		P->sign = -1;
@@ -398,13 +402,20 @@ BigInteger prod(BigInteger A, BigInteger B) {
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE* out, BigInteger N) {
+	if (length(N->magnitude) > 1) {
+		while (front(N->magnitude) == 0) {
+			deleteFront(N->magnitude);
+		}
+	}
 	if (N->sign == -1) {
 		fprintf(out, "-");
 	}
 	moveFront(N->magnitude);
+	fprintf(out, "%ld", get(N->magnitude));
+	moveNext(N->magnitude);
 	while (index(N->magnitude) != -1) {
-		fprintf(out, "%ld", get(N->magnitude));
-		//fprintf(out, "%0*ld", POWER, get(N->magnitude));
+		//fprintf(out, "%ld", get(N->magnitude));
+		fprintf(out, "%0*ld", POWER, get(N->magnitude));
 		moveNext(N->magnitude);
 		//fprintf(out, " ");
 	}

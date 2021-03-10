@@ -13,7 +13,7 @@
 #include<string.h>
 #include<stdbool.h>
 #include "BigInteger.h"
-#define MAX_LEN 1000
+#define MAX_LEN 15000
 
 int main(int argc, char * argv[]){
 
@@ -52,31 +52,38 @@ int main(int argc, char * argv[]){
 	BigInteger A = stringToBigInteger(array[1]);
 	BigInteger B = stringToBigInteger(array[3]);
 	BigInteger C = newBigInteger();
-	BigInteger D = newBigInteger();
-	BigInteger E = newBigInteger();
 	
+	//A
 	printBigInteger(out, A);
 	fprintf(out, "\n\n");
 	
+	//B
 	printBigInteger(out, B);
 	fprintf(out, "\n\n");
 	
+	//A+B
 	add(C,A,B);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
 	
+	//A-B
 	subtract(C,A,B);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
 	
+	//A-A
 	subtract(C,A,A);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
 	
-	for (int i = 0; i < 2; i++) {
-		add(D,A,A);
-	}
-	subtract(C,D,B);
+	//3A-2B
+	BigInteger D = stringToBigInteger("00000000003");
+	BigInteger E = stringToBigInteger("00000000002");
+	
+	multiply(A,A,D);
+	multiply(B,B,E);
+	
+	subtract(C,A,B);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
 	

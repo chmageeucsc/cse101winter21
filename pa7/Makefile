@@ -28,7 +28,7 @@ ADT2_HEADER    = $(ADT2).h
 COMPILE        = gcc -c -std=c11 -Wall
 LINK           = gcc -o
 REMOVE         = rm -f
-MEMCHECK       = valgrind --leak-check=full
+MEMCHECK       = valgrind --leak-check=full --show-leak-kinds=all
 
 $(CLIENT) : $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)
 	$(LINK) $(CLIENT) $(OBJECT) $(ADT1_OBJECT) $(ADT2_OBJECT)

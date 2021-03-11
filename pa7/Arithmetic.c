@@ -77,16 +77,60 @@ int main(int argc, char * argv[]){
 	fprintf(out, "\n\n");
 	
 	//3A-2B
-	BigInteger D = stringToBigInteger("00000000003");
-	BigInteger E = stringToBigInteger("00000000002");
+	BigInteger D = stringToBigInteger("000000003");
+	BigInteger E = stringToBigInteger("000000002");
+	BigInteger AD = newBigInteger();
+	BigInteger BE = newBigInteger();
 	
-	multiply(A,A,D);
-	multiply(B,B,E);
+	multiply(AD,A,D);
+	multiply(BE,B,E);
 	
-	subtract(C,A,B);
+	subtract(C,AD,BE);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
 	
+	//AB
+	multiply(C,A,B);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	//A^2
+	multiply(C,A,A);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	//B^2
+	multiply(C,B,B);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	//9A^4 + 16B^5
+	BigInteger A9 = stringToBigInteger("9");
+	BigInteger B16 = stringToBigInteger("16");
+	BigInteger A2A = prod(A,A);
+	BigInteger A4 = prod(A2A,A2A);
+	BigInteger Aa = prod(A9,A4);
+	BigInteger B2B = prod(B,B);
+	BigInteger B4B = prod(B2B,B2B);
+	BigInteger B5 = prod(B4B,B);
+	BigInteger Bb = prod(B16,B5);
+	
+	add(C,Aa,Bb);
+	printBigInteger(out, C);
+	fprintf(out, "\n\n");
+	
+	freeBigInteger(&A2A);
+	freeBigInteger(&A4);
+	freeBigInteger(&A9);
+	freeBigInteger(&Aa);
+	freeBigInteger(&B2B);
+	freeBigInteger(&B4B);
+	freeBigInteger(&B5);
+	freeBigInteger(&B16);
+	freeBigInteger(&Bb);
+	
+	freeBigInteger(&BE);
+	freeBigInteger(&AD);
 	freeBigInteger(&E);
 	freeBigInteger(&D);
 	freeBigInteger(&C);

@@ -368,6 +368,9 @@ void multiply(BigInteger P, BigInteger A, BigInteger B) {
 			moveBack(P->magnitude);
 			ans = get(tempA->magnitude) * get(tempB->magnitude);
 			for (int i = 0; i < shift; i++) {
+				if (index(P->magnitude) == 0) {
+					prepend(P->magnitude, 0);
+				}
 				movePrev(P->magnitude);
 			}
 			//prepend(P->magnitude, ans);

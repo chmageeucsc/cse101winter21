@@ -65,18 +65,36 @@ int main(int argc, char * argv[]){
 	add(C,A,B);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	//A-B
+	A = stringToBigInteger(array[1]);
+	B = stringToBigInteger(array[3]);
+	C = newBigInteger();
 	subtract(C,A,B);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	//A-A
+	A = stringToBigInteger(array[1]);
+	B = stringToBigInteger(array[3]);
+	C = newBigInteger();
 	subtract(C,A,A);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	//3A-2B
+	A = stringToBigInteger(array[1]);
+	B = stringToBigInteger(array[3]);
+	C = newBigInteger();
 	BigInteger D = stringToBigInteger("000000003");
 	BigInteger E = stringToBigInteger("000000002");
 	BigInteger AD = newBigInteger();
@@ -88,23 +106,49 @@ int main(int argc, char * argv[]){
 	subtract(C,AD,BE);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
+	freeBigInteger(&BE);
+	freeBigInteger(&AD);
 	
 	//AB
+	A = stringToBigInteger(array[1]);
+	B = stringToBigInteger(array[3]);
+	C = newBigInteger();
 	multiply(C,A,B);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	//A^2
+	A = stringToBigInteger(array[1]);
+	B = stringToBigInteger(array[3]);
+	C = newBigInteger();
 	multiply(C,A,A);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	//B^2
+	A = stringToBigInteger(array[1]);
+	B = stringToBigInteger(array[3]);
+	C = newBigInteger();
 	multiply(C,B,B);
 	printBigInteger(out, C);
 	fprintf(out, "\n\n");
+	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
 	
 	//9A^4 + 16B^5
+	A = stringToBigInteger(array[1]);
+	B = stringToBigInteger(array[3]);
+	C = newBigInteger();
 	BigInteger A9 = stringToBigInteger("9");
 	BigInteger B16 = stringToBigInteger("16");
 	BigInteger A2A = prod(A,A);
@@ -129,8 +173,6 @@ int main(int argc, char * argv[]){
 	freeBigInteger(&B16);
 	freeBigInteger(&Bb);
 	
-	freeBigInteger(&BE);
-	freeBigInteger(&AD);
 	freeBigInteger(&E);
 	freeBigInteger(&D);
 	freeBigInteger(&C);

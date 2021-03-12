@@ -404,6 +404,7 @@ void delete(List L) {
 	else {
 		Node temp = L->cursor;
 		L->cursor->prev->next = L->cursor->next;
+		L->cursor->next->prev = L->cursor->prev;
 		free(temp);
 		L->length--;
 	}

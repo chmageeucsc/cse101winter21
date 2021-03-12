@@ -178,7 +178,7 @@ BigInteger copy(BigInteger N) {
 int normalizeList(List L) {
 	moveBack(L);
 	while(index(L) != 0) {
-		if (get(L) > BASE-1) {
+		if (get(L) >= BASE) {
 			long sub = 0, subCarry = 0;
 			subCarry = get(L)/BASE;	// number to add previous node by
 			sub = subCarry * BASE; // number to subtract current node by
@@ -196,10 +196,10 @@ int normalizeList(List L) {
 		}
 		else { movePrev(L);}
 	}
-	if (front(L) > BASE-1) {
+	if (front(L) >= BASE) {
 		moveFront(L);
 		int carry = 0;
-		while (front(L) > BASE-1) {
+		while (front(L) >= BASE) {
 			set(L, get(L) - BASE);
 			carry++;
 		}
@@ -355,7 +355,7 @@ void multiply(BigInteger P, BigInteger A, BigInteger B) {
 	}
 	long ans;
 	if (length(P->magnitude) == 0) {
-		append(P->magnitude, 0);
+		//append(P->magnitude, 0);
 		while (length(P->magnitude) < length(tempB->magnitude)) {
 		prepend(P->magnitude, 0);
 		}
@@ -405,6 +405,11 @@ BigInteger prod(BigInteger A, BigInteger B) {
 // printBigInteger()
 // Prints a base 10 string representation of N to filestream out.
 void printBigInteger(FILE* out, BigInteger N) {
+	long zero = 0;
+	if(length(N->magnitude) == 0) {
+		fprintf(out, "%0*ld", POWER, zero);
+		return;
+	}
 	if (length(N->magnitude) > 1) {
 		while (front(N->magnitude) == 0) {
 			deleteFront(N->magnitude);

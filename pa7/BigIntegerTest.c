@@ -20,19 +20,19 @@ int main() {
 	BigInteger C = newBigInteger();
 	BigInteger D = stringToBigInteger("246913578");
 	
-	printf("BigInt A =");
+	printf("BigInt A = ");
 	printBigInteger(stdout, A);
 	printf("\n");
-	printf("BigInt B (copy A) =");
+	printf("BigInt B (copy A) = ");
 	printBigInteger(stdout, B);
 	printf("\n");
-	printf("BigInt D =");
+	printf("BigInt D = ");
 	printBigInteger(stdout, D);
 	printf("\nmake D zero\n");
 	
 	makeZero(D);
 	
-	printf("BigInt D =");
+	printf("BigInt D = ");
 	printBigInteger(stdout, D);
 	printf("\n\n");
 	
@@ -78,6 +78,47 @@ int main() {
 	printBigInteger(stdout, C);
 	printf("\n\n");
 	freeBigInteger(&C);
+	freeBigInteger(&B);
+	freeBigInteger(&A);
+	
+	A = stringToBigInteger("+123456789");
+	B = stringToBigInteger("+987654321");
+	C = newBigInteger();
+	printf("+A * +B = ");
+	multiply(C,A,B);
+	printBigInteger(stdout, C);
+	printf("\n");
+	freeBigInteger(&B);
+	freeBigInteger(&A);
+	
+	A = stringToBigInteger("+123456789");
+	B = stringToBigInteger("-987654321");
+	printf("+A * -B = ");
+	multiply(C,A,B);
+	printBigInteger(stdout, C);
+	printf("\n");
+	freeBigInteger(&B);
+	freeBigInteger(&A);
+	
+	A = stringToBigInteger("-123456789");
+	B = stringToBigInteger("+987654321");
+	printf("-A * +B = ");
+	multiply(C,A,B);
+	printBigInteger(stdout, C);
+	printf("\n");
+	freeBigInteger(&B);
+	freeBigInteger(&A);
+	
+	A = stringToBigInteger("-123456789");
+	B = stringToBigInteger("-987654321");
+	printf("-A * -B = ");
+	multiply(C,A,B);
+	printBigInteger(stdout, C);
+	printf("\n");
+	
+	freeBigInteger(&A);
+	freeBigInteger(&C);
+	freeBigInteger(&B);
 	
 	A = stringToBigInteger("123456789");
 	B = stringToBigInteger("987654321");
@@ -132,7 +173,6 @@ int main() {
 	freeBigInteger(&A);
 	freeBigInteger(&C);
 	freeBigInteger(&B);
-	freeBigInteger(&D);
 	
 	printf("\n");
 	
@@ -174,49 +214,6 @@ int main() {
 	freeBigInteger(&A);
 	freeBigInteger(&C);
 	freeBigInteger(&B);
-	freeBigInteger(&D);
-	
-	printf("\n");
-	
-	A = stringToBigInteger("+123456789");
-	B = stringToBigInteger("+987654321");
-	C = newBigInteger();
-	printf("+A * +B = ");
-	multiply(C,A,B);
-	printBigInteger(stdout, C);
-	printf("\n");
-	freeBigInteger(&B);
-	freeBigInteger(&A);
-	
-	A = stringToBigInteger("+123456789");
-	B = stringToBigInteger("-987654321");
-	printf("+A * -B = ");
-	multiply(C,A,B);
-	printBigInteger(stdout, C);
-	printf("\n");
-	freeBigInteger(&B);
-	freeBigInteger(&A);
-	
-	A = stringToBigInteger("-123456789");
-	B = stringToBigInteger("+987654321");
-	printf("-A * +B = ");
-	multiply(C,A,B);
-	printBigInteger(stdout, C);
-	printf("\n");
-	freeBigInteger(&B);
-	freeBigInteger(&A);
-	
-	A = stringToBigInteger("-123456789");
-	B = stringToBigInteger("-987654321");
-	printf("-A * -B = ");
-	multiply(C,A,B);
-	printBigInteger(stdout, C);
-	printf("\n");
-	
-	freeBigInteger(&A);
-	freeBigInteger(&C);
-	freeBigInteger(&B);
-	freeBigInteger(&D);
 	
 	return 0;
 }

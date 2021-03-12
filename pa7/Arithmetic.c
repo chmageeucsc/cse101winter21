@@ -13,7 +13,7 @@
 #include<string.h>
 #include<stdbool.h>
 #include "BigInteger.h"
-#define MAX_LEN 15000
+#define MAX_LEN 10005
 
 int main(int argc, char * argv[]){
 
@@ -41,7 +41,7 @@ int main(int argc, char * argv[]){
 	}
 	
 	line_count = 0;
-	char *array [200000];
+	char *array [MAX_LEN];
 	// read each line of input file
 	while( fgets(line, MAX_LEN, in) != NULL)  {
 		array[line_count] = calloc(strlen(line) + 1, sizeof(char*));
@@ -149,8 +149,8 @@ int main(int argc, char * argv[]){
 	A = stringToBigInteger(array[1]);
 	B = stringToBigInteger(array[3]);
 	C = newBigInteger();
-	BigInteger A9 = stringToBigInteger("9");
-	BigInteger B16 = stringToBigInteger("16");
+	BigInteger A9 = stringToBigInteger("000000009");
+	BigInteger B16 = stringToBigInteger("000000016");
 	BigInteger A2A = prod(A,A);
 	BigInteger A4 = prod(A2A,A2A);
 	BigInteger Aa = prod(A9,A4);
@@ -161,7 +161,7 @@ int main(int argc, char * argv[]){
 	
 	add(C,Aa,Bb);
 	printBigInteger(out, C);
-	fprintf(out, "\n\n");
+	fprintf(out, "\n");
 	
 	freeBigInteger(&A2A);
 	freeBigInteger(&A4);
